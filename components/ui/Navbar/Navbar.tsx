@@ -21,16 +21,27 @@ export default async function Navbar() {
         <div className="relative flex flex-row justify-between py-4 align-center md:py-6">
           <div className="flex items-center flex-1">
             <Link href="/" className={s.logo} aria-label="Logo">
-              <Logo />
+              <p className="text-2xl font-bold text-white">clonage</p>
             </Link>
             <nav className="hidden ml-6 space-x-2 lg:block">
               <Link href="/" className={s.link}>
-                Pricing
+                features
+              </Link>
+              <Link href="/" className={s.link}>
+                pricing
+              </Link>
+              <Link href="/demo" className={s.link}>
+                demo
               </Link>
               {user && (
-                <Link href="/account" className={s.link}>
-                  Account
-                </Link>
+                <>
+                  <Link href="/account" className={s.link}>
+                    account
+                  </Link>
+                  <Link href="/dashboard" className={s.link}>
+                    dashboard
+                  </Link>
+                </>
               )}
             </nav>
           </div>
@@ -39,7 +50,7 @@ export default async function Navbar() {
               <SignOutButton />
             ) : (
               <Link href="/signin" className={s.link}>
-                Sign in
+                sign in
               </Link>
             )}
           </div>
