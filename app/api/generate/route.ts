@@ -4,11 +4,13 @@ import { Database } from '@/types_db';
 import { randomString } from '../replicate/route';
 import { replicate } from '@/utils/replicate';
 import { cookies } from 'next/headers';
-import { getURL } from '@/utils/helpers';
 
 export async function POST(req: Request) {
   if (req.method === 'POST') {
     const supabase = createRouteHandlerClient<Database>({ cookies });
+    const {
+      data: { user }
+    } = await supabase.auth.getUser();
 
     const uploadFileToStorage = async (
       bucket: string,
@@ -18,10 +20,7 @@ export async function POST(req: Request) {
     ): Promise<string> => {
       try {
         await supabase.storage.from(bucket).upload(path, file, { contentType });
-
-        // Get the URL of the uploaded file
-        const { data } = await supabase.storage.from(bucket).getPublicUrl(path);
-
+        const { data } = supabase.storage.from(bucket).getPublicUrl(path);
         return data?.publicUrl;
       } catch (error) {
         console.error(error);
@@ -36,13 +35,24 @@ export async function POST(req: Request) {
     console.log('textInput', text);
 
     try {
-      /*  const response = await fetch(getURL() + '/api/voice', {
-        method: 'POST',
-        body: JSON.stringify({ text })
-      }); */
+      const { data, error } = await supabase
+        .from('voices')
+        .select('voice_id')
+        .eq('user', user?.id);
 
-      const response = await fetch(
-        'https://api.elevenlabs.io/v1/text-to-speech/ZXsyeDWdY91WGp3xkrqw',
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (!data || data.length === 0) {
+        throw new Error('No voice_id returned from Supabase');
+      }
+
+      const { voice_id } = data[0];
+      console.log('voice_id', voice_id);
+
+      /*  const response = await fetch(
+        'https://api.elevenlabs.io/v1/text-to-speech/' + voice_id,
         {
           method: 'POST',
           headers: {
@@ -54,14 +64,40 @@ export async function POST(req: Request) {
             text,
             model_id: 'eleven_multilingual_v2',
             voice_settings: {
-              "stability": 0.5,
-              "similarity_boost": 0.75,
-              "style": 0.5,
-              "use_speaker_boost": true
+              stability: 0.5,
+              similarity_boost: 0.75,
+              style: 0.5,
+              use_speaker_boost: true
             }
           })
         }
-      );
+      ); */
+
+      const elevenUrl =
+        'https://api.elevenlabs.io/v1/text-to-speech/' + voice_id;
+      console.log('elevenUrl', elevenUrl);
+
+      const response = await fetch(elevenUrl, {
+        method: 'POST',
+        headers: {
+          accept: 'audio/mpeg',
+          'xi-api-key': process.env.ELEVENLABS_API_TOKEN as string,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          text,
+          model_id: 'eleven_multilingual_v2',
+          voice_settings: {
+            stability: 0.5,
+            similarity_boost: 0.5
+          }
+        })
+      });
+
+      console.log('audio voice', JSON.stringify(response));
+      if (!response.ok) {
+        throw new Error('Error generating audio');
+      }
       const genAudio = await response.blob();
       // Upload the result to Supabase Storage
       const audioUrl = await uploadFileToStorage(

@@ -5,9 +5,10 @@ import { Label } from "@/components/ui/label"
 
 interface InputVideoProps {
   onFileChange: (file: File | null) => void;
+  label?: string;
 }
 
-export function InputVideo({ onFileChange }: InputVideoProps) {
+export function InputVideo({ onFileChange, label }: InputVideoProps) {
   const [fileUrl, setFileUrl] = useState<string | null>(null);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,9 +23,9 @@ export function InputVideo({ onFileChange }: InputVideoProps) {
 
   return (
     <div className="grid w-full max-w-sm items-center justify-center gap-1.5 text-white">
-      <Label htmlFor="videoInput">video</Label>
+      <Label htmlFor="videoInput">{label}</Label>
       <Input id="videoInput" type="file" onChange={handleChange} />
-      {fileUrl && <video src={fileUrl} controls autoPlay />}
+      {fileUrl && <video src={fileUrl} controls />}
     </div>
   )
 }

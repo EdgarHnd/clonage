@@ -24,22 +24,22 @@ export default async function Navbar() {
               <p className="text-2xl font-bold text-white">clonage</p>
             </Link>
             <nav className="hidden ml-6 space-x-2 lg:block">
-              <Link href="/" className={s.link}>
-                features
-              </Link>
-              <Link href="/" className={s.link}>
-                pricing
-              </Link>
-              <Link href="/demo" className={s.link}>
-                demo
-              </Link>
-              {user && (
+              {user ? (
                 <>
-                  <Link href="/account" className={s.link}>
-                    account
+                  <Link href="/setup" className={s.link}>
+                    setup
                   </Link>
-                  <Link href="/dashboard" className={s.link}>
-                    dashboard
+                  <Link href="/generate" className={s.link}>
+                    generate
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link href="/" className={s.link}>
+                    features
+                  </Link>
+                  <Link href="/" className={s.link}>
+                    pricing
                   </Link>
                 </>
               )}
@@ -47,7 +47,12 @@ export default async function Navbar() {
           </div>
           <div className="flex justify-end flex-1 space-x-8">
             {user ? (
-              <SignOutButton />
+              <>
+                <Link href="/account" className={s.link}>
+                  account
+                </Link>
+                <SignOutButton />
+              </>
             ) : (
               <Link href="/signin" className={s.link}>
                 sign in
