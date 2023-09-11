@@ -1,7 +1,7 @@
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { randomString } from '../replicate/route';
 import { cookies } from 'next/headers';
 import { Database } from '@/lib/database.types';
+import { randomString } from '@/lib/utils';
 
 export async function POST(req: Request) {
   if (req.method === 'POST') {

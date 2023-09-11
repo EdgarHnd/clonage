@@ -55,7 +55,7 @@ export async function POST(req: Request) {
       // Store the voice_id in Supabase
       const { error } = await supabase.from('voices').insert([
         {
-          voice_id,
+          id: voice_id,
           name: voiceName,
           description: voiceDescription,
           user: user?.id
