@@ -1,115 +1,151 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import { InputVideo } from '@/app/generate/inputs/inputVideo';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { useEffect, useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import NewGenerationButton from './newGenerationButton';
+import { Database } from '@/lib/database.types';
+import { useRouter } from 'next/navigation';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
+
+type Generation = Database['public']['Tables']['generations']['Row'];
 
 export default function DemoPage() {
   const [loading, setLoading] = useState(false);
   const [output, setOutput] = useState<any>(null);
   const [videoFile, setVideoFile] = useState<File | null>();
   const [script, setScript] = useState<string>('');
+  const [generations, setGenerations] = useState<Generation[]>([]);
+
+  
 
   const [voice, setVoice] = useState<string>('');
-/*   const supabase = createClientComponentClient();
 
-  const [session] = await Promise.all([supabase.auth.getSession()]);
+  const fetchGenerations = async () => {
+    try {
+      const supabase = createClientComponentClient();
+      const {
+        data: { user }
+      } = await supabase.auth.getUser();
 
-  const user = session.data.session?.user;
+      if (!user?.id) {
+        throw new Error('User not found');
+      }
 
-  useEffect(() => {
-    if (!user) return;
-    const fetchVoiceId = async () => {
+      const { data, error } = await supabase
+        .from('generations')
+        .select('*')
+        .eq('user', user.id);
+      if (error) throw error;
+      console.log('data' + JSON.stringify(data));
+      if (data) {
+        setGenerations(data as Generation[]);
+      }
+      return data;
+    } catch (error) {
+      console.error('Error in fetchGenerations: ', error);
+      throw error;
+    }
+  };
+
+  const fetchVoice = async () => {
+    try {
+      const supabase = createClientComponentClient();
+      const {
+        data: { user }
+      } = await supabase.auth.getUser();
+
+      if (!user?.id) {
+        throw new Error('User not found');
+      }
+
       const { data, error } = await supabase
         .from('voices')
         .select('voice_id')
-        .eq('user', user?.id)
+        .eq('user', user.id)
         .single();
-
-      if (error) {
-        console.error('Error fetching voice id: ', error);
-      } else if (data) {
+      if (error) throw error;
+      console.log('data' + JSON.stringify(data));
+      if (data) {
         setVoice(data.voice_id);
       }
-    };
-    if (user) {
-      fetchVoiceId();
-    }
-  }, [user]); */
-
-  const handleVideoFileChange = (newFile: File | null) => {
-    setVideoFile(newFile);
-  };
-
-  const runModel = async () => {
-    if (!videoFile || !script) return;
-    try {
-      setLoading(true);
-
-      // Create a FormData instance
-      const data = new FormData();
-      data.set('videoInput', videoFile);
-      data.set('textInput', script);
-
-      // Run the model
-      const response = await fetch('/api/generate', {
-        method: 'POST',
-        body: data
-      });
-      const { output } = await response.json();
-      setOutput(output);
+      return data;
     } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
+      console.error('Error in fetchVoice: ', error);
+      throw error;
     }
   };
 
-  const handleClick = () => {
-    setOutput(null);
-    runModel();
+  useEffect(() => {
+    fetchGenerations();
+    fetchVoice();
+  }, []);
+
+  const router = useRouter();
+  const handleGenerationClick = (id: string) => () => {
+    router.push(`/generation/${id}`);
+  };
+
+  const badgecolor = (status: string | null) => {
+    switch (status) {
+      case 'created':
+        return 'bg-yellow-500';
+      case 'processing':
+        return 'bg-yellow-500';
+      case 'completed':
+        return 'bg-green-500';
+      case 'failed':
+        return 'bg-red-500';
+      default:
+        return 'bg-yellow-500';
+    }
   };
 
   return (
     <div className="max-w-6xl px-4 py-8 mx-auto sm:py-24 sm:px-6 lg:px-8">
       <div className="flex flex-col items-center space-y-12">
-        <h1 className="text-white text-2xl font-bold">product demo</h1>
-        {voice ? (
-          <p className="text-white text-lg">
-            You are using the voice model with id: {voice}
-          </p>
+        <h1 className="text-white text-2xl font-bold">generate videos</h1>
+        {!voice ? (
+          <div className="flex flex-col items-center space-y-4 text-white">
+            <p>you don't have a voice yet</p>
+            <Link href="/setup">
+              <Button className="text-white">setup</Button>
+            </Link>
+          </div>
         ) : (
-          <p className="text-white text-lg">You don't have a voice model yet</p>
+          <>
+            <NewGenerationButton />
+            <div className="grid grid-cols-4 gap-4">
+              {generations.map((generation) => (
+                <Card
+                  onClick={handleGenerationClick(generation.id)}
+                  className="text-white flex flex-col items-center bg-black p-4 space-y-4 cursor-pointer"
+                  key={generation.id}
+                >
+                  <CardHeader>
+                    <Badge className={badgecolor(generation.status)}>
+                      {generation.status}
+                    </Badge>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-center">
+                      {generation.input_text || 'click to complete generation'}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </>
         )}
-        <div className="flex flex-row space-x-6 w-full items-start justify-center">
-          <div className="w-1/2">
-            <InputVideo
-              label="reference video"
-              onFileChange={handleVideoFileChange}
-            />
-          </div>
-          <div className="w-1/2 text-white h-[300px]">
-            <Label htmlFor="script">script</Label>
-            <Textarea
-              id="script"
-              value={script}
-              onChange={(e) => setScript(e.target.value)}
-              className=" w-full h-full"
-              placeholder="type your video script here."
-            />
-          </div>
-        </div>
-        <Button className="mt-12" onClick={handleClick}>
-          {loading ? 'loading...' : 'generate'}
-        </Button>
-        <div className="flex flex-row space-x-6 w-full items-start justify-center">
-          <div className="w-1/2 text-white h-[300px]">
-            <Label htmlFor="output">output</Label>
-            {output && <video src={output} controls />}
-          </div>
-        </div>
       </div>
     </div>
   );

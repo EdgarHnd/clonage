@@ -31,6 +31,55 @@ export interface Database {
           }
         ]
       }
+      generations: {
+        Row: {
+          created_at: string
+          id: string
+          input_text: string | null
+          input_video: string | null
+          output_audio: string | null
+          output_video: string | null
+          status: string | null
+          user: string | null
+          voice: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          input_text?: string | null
+          input_video?: string | null
+          output_audio?: string | null
+          output_video?: string | null
+          status?: string | null
+          user?: string | null
+          voice?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          input_text?: string | null
+          input_video?: string | null
+          output_audio?: string | null
+          output_video?: string | null
+          status?: string | null
+          user?: string | null
+          voice?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generations_user_fkey"
+            columns: ["user"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "generations_voice_fkey"
+            columns: ["voice"]
+            referencedRelation: "voices"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       prices: {
         Row: {
           active: boolean | null
@@ -200,6 +249,40 @@ export interface Database {
           {
             foreignKeyName: "users_id_fkey"
             columns: ["id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      voices: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: number
+          name: string | null
+          user: string | null
+          voice_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: number
+          name?: string | null
+          user?: string | null
+          voice_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: number
+          name?: string | null
+          user?: string | null
+          voice_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "voices_user_fkey"
+            columns: ["user"]
             referencedRelation: "users"
             referencedColumns: ["id"]
           }

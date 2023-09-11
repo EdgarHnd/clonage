@@ -1,16 +1,9 @@
 // app/api/generate/route.ts
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { Database } from '@/types_db';
 import { randomString } from '../replicate/route';
 import { replicate } from '@/utils/replicate';
 import { cookies } from 'next/headers';
-
-export const config = {
-  api: {
-    responseLimit: false,
-  },
-}
-
+import { Database } from '@/lib/database.types';
 
 export async function POST(req: Request) {
   if (req.method === 'POST') {

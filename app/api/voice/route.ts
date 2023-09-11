@@ -1,7 +1,7 @@
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { Database } from '@/types_db';
 import { randomString } from '../replicate/route';
 import { cookies } from 'next/headers';
+import { Database } from '@/lib/database.types';
 
 if (!process.env.ELEVENLABS_API_TOKEN) {
   throw new Error(

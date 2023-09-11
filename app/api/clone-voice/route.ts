@@ -1,5 +1,5 @@
+import { Database } from '@/lib/database.types';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { Database } from '@/types_db';
 import { cookies } from 'next/headers';
 
 if (!process.env.ELEVENLABS_API_TOKEN) {

@@ -1,7 +1,7 @@
 'use client';
 
 import {Button} from '@/components/ui/button';
-import { Database } from '@/types_db';
+import { Database } from '@/lib/database.types';
 import { postData } from '@/utils/helpers';
 import { getStripe } from '@/utils/stripe-client';
 import { Session, User } from '@supabase/supabase-js';

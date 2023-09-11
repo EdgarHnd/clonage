@@ -1,6 +1,6 @@
+import { Database } from '@/lib/database.types';
 import { replicate } from '@/utils/replicate';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { Database } from '@/types_db';
 import { cookies } from 'next/headers';
 
 //function to generate a random string of length n
