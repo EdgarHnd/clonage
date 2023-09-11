@@ -5,6 +5,13 @@ import { randomString } from '../replicate/route';
 import { replicate } from '@/utils/replicate';
 import { cookies } from 'next/headers';
 
+export const config = {
+  api: {
+    responseLimit: false,
+  },
+}
+
+
 export async function POST(req: Request) {
   if (req.method === 'POST') {
     const supabase = createRouteHandlerClient<Database>({ cookies });
