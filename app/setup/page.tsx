@@ -185,12 +185,6 @@ export default function SetupPage() {
             <Button className="mt-12" onClick={handleClick}>
               {loading ? 'loading...' : 'clone voice'}
             </Button>
-            <div className="flex flex-row space-x-6 w-full items-start justify-center">
-              <div className="w-1/2 text-white h-[300px]">
-                <Label htmlFor="output">output</Label>
-                {output && <audio src={output} controls />}
-              </div>
-            </div>
           </>
         )}
       </div>
