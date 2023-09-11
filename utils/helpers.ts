@@ -1,4 +1,4 @@
-import { Database } from '@/types_db';
+import { Database } from "@/lib/database.types";
 
 type Price = Database['public']['Tables']['prices']['Row'];
 
