@@ -44,7 +44,9 @@ export default function DemoPage() {
       const { data, error } = await supabase
         .from('generations')
         .select('*')
-        .eq('user', user.id);
+        .eq('user', user.id)
+        .order('created_at', { ascending: false });
+
       if (error) throw error;
       console.log('data' + JSON.stringify(data));
       if (data) {
@@ -70,13 +72,13 @@ export default function DemoPage() {
 
       const { data, error } = await supabase
         .from('voices')
-        .select('voice_id')
+        .select('id')
         .eq('user', user.id)
         .single();
       if (error) throw error;
       console.log('data' + JSON.stringify(data));
       if (data) {
-        setVoice(data.voice_id);
+        setVoice(data.id);
       }
       return data;
     } catch (error) {

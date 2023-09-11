@@ -1,12 +1,8 @@
 import { Database } from '@/lib/database.types';
+import { randomString } from '@/lib/utils';
 import { replicate } from '@/utils/replicate';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-
-//function to generate a random string of length n
-export function randomString(n: number) {
-  return [...Array(n)].map(() => Math.random().toString(36)[2]).join('');
-}
 
 export async function POST(req: Request) {
   if (req.method === 'POST') {

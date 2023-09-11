@@ -1,16 +1,50 @@
 // app/api/generate/route.ts
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { randomString } from '../replicate/route';
 import { replicate } from '@/utils/replicate';
 import { cookies } from 'next/headers';
 import { Database } from '@/lib/database.types';
+import { randomString } from '@/lib/utils';
 
-export async function POST(req: Request) {
+export async function POST(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   if (req.method === 'POST') {
     const supabase = createRouteHandlerClient<Database>({ cookies });
     const {
       data: { user }
     } = await supabase.auth.getUser();
+
+    // Fetch the generation item
+    const { data: generation, error: fetchError } = await supabase
+      .from('generations')
+      .select('*')
+      .eq('id', params.id)
+      .single();
+
+    if (fetchError) {
+      throw new Error(fetchError.message);
+    }
+
+    if (!generation) {
+      throw new Error('No generation item found');
+    }
+
+    // Fetch the video file from the URL
+    if (!generation.input_video) {
+      throw new Error('No input video provided');
+    }
+
+    if (!generation.input_text) {
+      throw new Error('No input text provided');
+    }
+
+    if (!generation.voice) {
+      throw new Error('No voice provided');
+    }
+
+    const videoResponse = await fetch(generation.input_video);
+    const video: Blob = await videoResponse.blob();
 
     const uploadFileToStorage = async (
       bucket: string,
@@ -28,16 +62,10 @@ export async function POST(req: Request) {
       }
     };
 
-    const inputData = await req.formData();
-    const video: File = inputData.get('videoInput') as unknown as File;
-    const text: string = inputData.get('textInput') as unknown as string;
-    console.log('videoInput', video);
-    console.log('textInput', text);
-
     try {
       const { data, error } = await supabase
         .from('voices')
-        .select('voice_id')
+        .select('id')
         .eq('user', user?.id);
 
       if (error) {
@@ -48,33 +76,10 @@ export async function POST(req: Request) {
         throw new Error('No voice_id returned from Supabase');
       }
 
-      const { voice_id } = data[0];
-      console.log('voice_id', voice_id);
+      const { id } = data[0];
+      console.log('voice_id', id);
 
-      /*  const response = await fetch(
-        'https://api.elevenlabs.io/v1/text-to-speech/' + voice_id,
-        {
-          method: 'POST',
-          headers: {
-            accept: 'audio/mpeg',
-            'xi-api-key': process.env.ELEVENLABS_API_TOKEN as string,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            text,
-            model_id: 'eleven_multilingual_v2',
-            voice_settings: {
-              stability: 0.5,
-              similarity_boost: 0.75,
-              style: 0.5,
-              use_speaker_boost: true
-            }
-          })
-        }
-      ); */
-
-      const elevenUrl =
-        'https://api.elevenlabs.io/v1/text-to-speech/' + voice_id;
+      const elevenUrl = 'https://api.elevenlabs.io/v1/text-to-speech/' + id;
       console.log('elevenUrl', elevenUrl);
 
       const response = await fetch(elevenUrl, {
@@ -85,7 +90,7 @@ export async function POST(req: Request) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          text,
+          text: generation.input_text,
           model_id: 'eleven_multilingual_v2',
           voice_settings: {
             stability: 0.5,
@@ -94,28 +99,30 @@ export async function POST(req: Request) {
         })
       });
 
-      console.log('audio voice', JSON.stringify(response));
       if (!response.ok) {
-        throw new Error('Error generating audio');
+        console.log(await response.text());
+        throw new Error('Server responded with status ' + response.status);
       }
       const genAudio = await response.blob();
       // Upload the result to Supabase Storage
+      const path = `generations/${params.id}/${
+        'output_audio' + randomString(10) + '.mp3'
+      }`;
       const audioUrl = await uploadFileToStorage(
         'public',
-        'gen_audio' + randomString(10) + '.mp3',
+        path,
         genAudio,
         'audio/mp3'
       );
+      // update the generation item
+      await supabase
+        .from('generations')
+        .update({ output_audio: audioUrl })
+        .eq('id', params.id);
+
       console.log('audioUrl' + audioUrl);
       const audioResponse = await fetch(audioUrl);
       const audio: Blob = await audioResponse.blob();
-
-      // Upload the input files
-      await supabase.storage
-        .from('public')
-        .upload('video' + randomString(10) + '.mp4', video, {
-          contentType: 'video/mp4'
-        });
 
       const videoBytes = await video.arrayBuffer();
       const audioBytes = await audio.arrayBuffer();
@@ -144,23 +151,37 @@ export async function POST(req: Request) {
           }
         }
       );
+      console.log('output' + output);
       // Fetch the video from the URL
       const resultUrl: string = output;
       const res = await fetch(resultUrl);
       const blob = await res.blob();
       // Upload the video to Supabase Storage
+      const videoPath = `generations/${params.id}/${
+        'output_video' + randomString(10) + '.mp4'
+      }`;
       const finalVideoUrl = await uploadFileToStorage(
         'public',
-        'final_video' + randomString(10) + '.mp4',
+        videoPath,
         blob,
         'video/mp4'
       );
       console.log(finalVideoUrl);
+      // Update the generation item
+      await supabase
+        .from('generations')
+        .update({ output_video: finalVideoUrl, status: 'completed' })
+        .eq('id', params.id);
+
       return new Response(JSON.stringify({ output: finalVideoUrl }), {
         status: 200
       });
     } catch (err: any) {
       console.log(err);
+      await supabase
+        .from('generations')
+        .update({ status: 'failed' })
+        .eq('id', params.id);
       return new Response(`Server Error: ${err.message}`, { status: 400 });
     }
   } else {

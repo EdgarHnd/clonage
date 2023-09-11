@@ -6,18 +6,18 @@ import { Textarea } from '@/components/ui/textarea';
 import { useEffect, useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import useSWR from 'swr';
-import { fetcher } from '@/lib/utils';
-import { getURL } from '@/utils/helpers';
-import { Database } from '@/lib/database.types';
+import { randomString } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
+import { TrashIcon } from '@radix-ui/react-icons';
 
 export default function Generation({ params }: { params: { id: string } }) {
-  /*  const { data } = useSWR<any>(`/api/generation/${params.id}`, fetcher, {
-    fallbackData,
-
-    refreshInterval: fallbackData.output || fallbackData.expired ? 0 : 500,
-    refreshWhenHidden: true,
-  }); */
+  const [loading, setLoading] = useState(false);
+  const [output, setOutput] = useState<any>(null);
+  const [videoFile, setVideoFile] = useState<File | null>();
+  const [script, setScript] = useState<string>('');
+  const [voice, setVoice] = useState<string>('');
   const supabase = createClientComponentClient();
+  const router = useRouter();
 
   const { data, error } = useSWR(`/api/generation/${params.id}`, async () => {
     const { data, error } = await supabase
@@ -30,60 +30,98 @@ export default function Generation({ params }: { params: { id: string } }) {
   });
 
   useEffect(() => {
+    if (!data) return;
     console.log('data' + JSON.stringify(data));
+    setVoice(data.voice);
+    setScript(data.input_text);
+    setOutput(data.output_video);
   }, [data]);
 
-  const [loading, setLoading] = useState(false);
-  const [output, setOutput] = useState<any>(null);
-  const [videoFile, setVideoFile] = useState<File | null>();
-  const [script, setScript] = useState<string>('');
+  const fetchVoice = async () => {
+    try {
+      const {
+        data: { user }
+      } = await supabase.auth.getUser();
 
-  const [voice, setVoice] = useState<string>('');
-  /*   const supabase = createClientComponentClient();
+      if (!user?.id) {
+        throw new Error('User not found');
+      }
 
-  const [session] = await Promise.all([supabase.auth.getSession()]);
-
-  const user = session.data.session?.user;
-
-  useEffect(() => {
-    if (!user) return;
-    const fetchVoiceId = async () => {
       const { data, error } = await supabase
         .from('voices')
-        .select('voice_id')
-        .eq('user', user?.id)
+        .select('id')
+        .eq('user', user.id)
         .single();
-
-      if (error) {
-        console.error('Error fetching voice id: ', error);
-      } else if (data) {
-        setVoice(data.voice_id);
+      if (error) throw error;
+      console.log('data' + JSON.stringify(data));
+      if (data) {
+        setVoice(data.id);
       }
-    };
-    if (user) {
-      fetchVoiceId();
+      return data;
+    } catch (error) {
+      console.error('Error in fetchVoice: ', error);
+      throw error;
     }
-  }, [user]); */
+  };
+
+  useEffect(() => {
+    fetchVoice();
+  });
 
   const handleVideoFileChange = (newFile: File | null) => {
     setVideoFile(newFile);
   };
 
   const runModel = async () => {
-    if (!videoFile || !script) return;
+    if (!script) return;
+    setLoading(true);
     try {
-      setLoading(true);
+      let inputVideoUrl = data?.input_video;
+      if (videoFile) {
+        // Upload the video file to Supabase storage
+        const path = `generations/${params.id}/${
+          'input_video' + randomString(10) + '.mp4'
+        }`;
+        const { error: uploadError } = await supabase.storage
+          .from('public')
+          .upload(path, videoFile);
 
-      // Create a FormData instance
-      const data = new FormData();
-      data.set('videoInput', videoFile);
-      data.set('textInput', script);
+        if (uploadError) {
+          throw uploadError;
+        }
 
-      // Run the model
-      const response = await fetch('/api/generate', {
-        method: 'POST',
-        body: data
+        // Get the URL of the uploaded video file
+        const { data: urlData } = supabase.storage
+          .from('public')
+          .getPublicUrl(path);
+
+        inputVideoUrl = urlData?.publicUrl;
+      }
+      if (!inputVideoUrl) {
+        throw new Error('Error getting input video URL');
+      }
+
+      // Update the generation item with the URL and text input
+      const { error: updateError } = await supabase
+        .from('generations')
+        .update({
+          input_video: inputVideoUrl,
+          input_text: script,
+          status: 'processing',
+          voice: voice
+        })
+        .eq('id', params.id);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      // Call the generate route with just the generation id
+      const response = await fetch(`/api/generate/${params.id}`, {
+        method: 'POST'
       });
+      const responseText = await response.text();
+      console.log(responseText);
       const { output } = await response.json();
       setOutput(output);
     } catch (error) {
@@ -98,22 +136,27 @@ export default function Generation({ params }: { params: { id: string } }) {
     runModel();
   };
 
+  const handleDelete = async () => {
+    const { error: deleteError } = await supabase
+      .from('generations')
+      .delete()
+      .eq('id', params.id);
+    if (deleteError) {
+      throw deleteError;
+    } else {
+      router.push('/generate');
+    }
+  };
+
   return (
     <div className="max-w-6xl px-4 py-8 mx-auto sm:py-24 sm:px-6 lg:px-8">
       <div className="flex flex-col items-center space-y-12">
-        <h1 className="text-white text-2xl font-bold">product demo</h1>
-        {voice ? (
-          <p className="text-white text-lg">
-            You are using the voice model with id: {voice}
-          </p>
-        ) : (
-          <p className="text-white text-lg">You don't have a voice model yet</p>
-        )}
         <div className="flex flex-row space-x-6 w-full items-start justify-center">
           <div className="w-1/2">
             <InputVideo
               label="reference video"
               onFileChange={handleVideoFileChange}
+              existingUrl={data?.input_video}
             />
           </div>
           <div className="w-1/2 text-white h-[300px]">
@@ -127,14 +170,28 @@ export default function Generation({ params }: { params: { id: string } }) {
             />
           </div>
         </div>
-        <Button className="mt-12" onClick={handleClick}>
-          {loading ? 'loading...' : 'generate'}
-        </Button>
-        <div className="flex flex-row space-x-6 w-full items-start justify-center">
-          <div className="w-1/2 text-white h-[300px]">
-            <Label htmlFor="output">output</Label>
-            {output && <video src={output} controls />}
+        {output && (
+          <div className="flex flex-row space-x-6 w-full items-start justify-center">
+            <div className="w-1/2 text-white">
+              <Label htmlFor="output">output</Label>
+              <video src={output} controls />
+            </div>
           </div>
+        )}
+        <div className="flex flex-row space-x-4 items-center mt-12">
+          <Button
+            variant="destructive"
+            size="icon"
+            className="text-xs"
+            onClick={handleDelete}
+          >
+            <TrashIcon />
+          </Button>
+          {data?.status != 'completed' && (
+            <Button onClick={handleClick}>
+              {loading ? 'loading...' : 'generate'}
+            </Button>
+          )}
         </div>
       </div>
     </div>

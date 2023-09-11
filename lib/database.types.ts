@@ -41,7 +41,7 @@ export interface Database {
           output_video: string | null
           status: string | null
           user: string | null
-          voice: number | null
+          voice: string | null
         }
         Insert: {
           created_at?: string
@@ -52,7 +52,7 @@ export interface Database {
           output_video?: string | null
           status?: string | null
           user?: string | null
-          voice?: number | null
+          voice?: string | null
         }
         Update: {
           created_at?: string
@@ -63,7 +63,7 @@ export interface Database {
           output_video?: string | null
           status?: string | null
           user?: string | null
-          voice?: number | null
+          voice?: string | null
         }
         Relationships: [
           {
@@ -258,26 +258,23 @@ export interface Database {
         Row: {
           created_at: string
           description: string | null
-          id: number
+          id: string
           name: string | null
           user: string | null
-          voice_id: string | null
         }
         Insert: {
           created_at?: string
           description?: string | null
-          id?: number
+          id: string
           name?: string | null
           user?: string | null
-          voice_id?: string | null
         }
         Update: {
           created_at?: string
           description?: string | null
-          id?: number
+          id?: string
           name?: string | null
           user?: string | null
-          voice_id?: string | null
         }
         Relationships: [
           {

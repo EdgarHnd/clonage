@@ -59,3 +59,8 @@ export const truncate = (str: string, length: number) => {
   if (!str || str.length <= length) return str;
   return `${str.slice(0, length)}...`;
 };
+
+//function to generate a random string of length n
+export function randomString(n: number) {
+  return [...Array(n)].map(() => Math.random().toString(36)[2]).join('');
+}

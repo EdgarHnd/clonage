@@ -6,10 +6,15 @@ import { Label } from "@/components/ui/label"
 interface InputVideoProps {
   onFileChange: (file: File | null) => void;
   label?: string;
+  existingUrl?: string;
 }
 
-export function InputVideo({ onFileChange, label }: InputVideoProps) {
+export function InputVideo({ onFileChange, label, existingUrl }: InputVideoProps) {
   const [fileUrl, setFileUrl] = useState<string | null>(null);
+
+  if (existingUrl && !fileUrl) {
+    setFileUrl(existingUrl);
+  }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {

@@ -38,14 +38,14 @@ export default function SetupPage() {
 
       const { data, error } = await supabase
         .from('voices')
-        .select('voice_id')
+        .select('id')
         .eq('user', user.id)
         .single();
 
       if (error) throw error;
 
       if (data) {
-        setVoice(data.voice_id);
+        setVoice(data.id);
       }
       return data;
     } catch (error) {
