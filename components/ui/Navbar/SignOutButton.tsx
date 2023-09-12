@@ -14,6 +14,7 @@ export default function SignOutButton() {
       onClick={async () => {
         await supabase.auth.signOut();
         router.push('/signin');
+        router.refresh();
       }}
     >
       sign out

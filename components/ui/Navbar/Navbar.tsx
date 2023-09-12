@@ -20,8 +20,9 @@ export default async function Navbar() {
       <div className="max-w-6xl px-6 mx-auto">
         <div className="relative flex flex-row justify-between py-4 align-center md:py-6">
           <div className="flex items-center flex-1">
-            <Link href="/" className={s.logo} aria-label="Logo">
-              <p className="text-2xl font-bold text-white">clonage</p>
+            <Link href="/" className="flex flex-row items-center" aria-label="Logo">
+              <Logo />
+              <p className="text-2xl font-bold text-white ml-3">clonage</p>
             </Link>
             <nav className="hidden ml-6 space-x-2 lg:block">
               {user ? (

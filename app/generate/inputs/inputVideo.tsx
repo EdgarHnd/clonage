@@ -7,9 +7,10 @@ interface InputVideoProps {
   onFileChange: (file: File | null) => void;
   label?: string;
   existingUrl?: string;
+  disabled?: boolean;
 }
 
-export function InputVideo({ onFileChange, label, existingUrl }: InputVideoProps) {
+export function InputVideo({ onFileChange, label, existingUrl, disabled }: InputVideoProps) {
   const [fileUrl, setFileUrl] = useState<string | null>(null);
 
   if (existingUrl && !fileUrl) {
@@ -27,9 +28,9 @@ export function InputVideo({ onFileChange, label, existingUrl }: InputVideoProps
   };
 
   return (
-    <div className="grid w-full max-w-sm items-center justify-center gap-1.5 text-white">
+    <div className="grid w-full space-y-4 max-w-sm items-center justify-center gap-1.5 text-white">
       <Label htmlFor="videoInput">{label}</Label>
-      <Input id="videoInput" type="file" onChange={handleChange} />
+      <Input disabled={disabled} id="videoInput" type="file" onChange={handleChange} />
       {fileUrl && <video src={fileUrl} controls />}
     </div>
   )

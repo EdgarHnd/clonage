@@ -22,7 +22,7 @@ export function InputAudio({ onFileChange, label }: InputAudioProps) {
   };
 
   return (
-    <div className="grid w-full max-w-sm items-center justify-center gap-1.5 text-white">
+    <div className="grid w-full space-y-4 max-w-sm items-center justify-center gap-1.5 text-white">
       <Label htmlFor="audioInput">{label}</Label>
       <Input id="audioInput" type="file" onChange={handleChange} />
       {fileUrl && <audio src={fileUrl} controls />}

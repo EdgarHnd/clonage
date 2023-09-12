@@ -165,11 +165,10 @@ export default function Pricing({
       <div className="max-w-6xl px-4 py-8 mx-auto sm:py-24 sm:px-6 lg:px-8">
         <div className="sm:flex sm:flex-col sm:align-center">
           <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
-            Pricing Plans
+            ✨ beta special pricing ✨
           </h1>
           <p className="max-w-2xl m-auto mt-5 text-xl text-zinc-200 sm:text-center sm:text-2xl">
-            Start building for free, then add a site plan to go live. Account
-            plans unlock additional features.
+            clonage is currently in beta, support the project now and get a special price for life.
           </p>
           <div className="relative self-center mt-6 bg-zinc-900 rounded-lg p-0.5 flex sm:mt-8 border border-zinc-800">
             {intervals.includes('month') && (

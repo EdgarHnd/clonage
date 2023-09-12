@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useEffect, useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import { randomString } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { TrashIcon } from '@radix-ui/react-icons';
@@ -123,7 +123,8 @@ export default function Generation({ params }: { params: { id: string } }) {
       const responseText = await response.text();
       console.log(responseText);
       const { output } = await response.json();
-      setOutput(output);
+      // After the model run is completed, refetch the data
+      mutate(`/api/generation/${params.id}`);
     } catch (error) {
       console.error(error);
     } finally {
@@ -148,36 +149,45 @@ export default function Generation({ params }: { params: { id: string } }) {
     }
   };
 
+  const renderOutput = () => {
+    if (!output) return null;
+    if (output) {
+      return (
+        <div className="flex flex-row space-x-6 w-full items-start justify-center">
+          <div className="flex flex-col space-y-4 w-1/2 text-white">
+            <Label htmlFor="output">output</Label>
+            <video src={output} controls />
+          </div>
+        </div>
+      );
+    }
+  };
+
   return (
     <div className="max-w-6xl px-4 py-8 mx-auto sm:py-24 sm:px-6 lg:px-8">
       <div className="flex flex-col items-center space-y-12">
         <div className="flex flex-row space-x-6 w-full items-start justify-center">
           <div className="w-1/2">
             <InputVideo
+              disabled={data?.status == 'completed'}
               label="reference video"
               onFileChange={handleVideoFileChange}
               existingUrl={data?.input_video}
             />
           </div>
-          <div className="w-1/2 text-white h-[300px]">
+          <div className="flex flex-col space-y-4 w-1/2 text-white h-[300px]">
             <Label htmlFor="script">script</Label>
             <Textarea
+              disabled={data?.status == 'completed'}
               id="script"
               value={script}
               onChange={(e) => setScript(e.target.value)}
-              className=" w-full h-full"
+              className=" w-full h-full p-4"
               placeholder="type your video script here."
             />
           </div>
         </div>
-        {output && (
-          <div className="flex flex-row space-x-6 w-full items-start justify-center">
-            <div className="w-1/2 text-white">
-              <Label htmlFor="output">output</Label>
-              <video src={output} controls />
-            </div>
-          </div>
-        )}
+        <>{renderOutput()}</>
         <div className="flex flex-row space-x-4 items-center mt-12">
           <Button
             variant="destructive"
