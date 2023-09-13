@@ -75,7 +75,6 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
       data.set('audioFile', audioFile);
       data.set('voiceName', voiceName);
       data.set('voiceDescription', voiceDescription);
-      console.log('clicked' + audioFile.name + voiceName + voiceDescription);
       const response = await fetch('/api/clone-voice', {
         method: 'POST',
         body: data
@@ -85,7 +84,6 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
       }
     } catch (error: any) {
       console.error(error);
-      console.log('error' + error.message);
     } finally {
       setLoading(false);
       fetchVoice();
@@ -126,7 +124,6 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
 
       if (error) throw error;
 
-      console.log('data' + JSON.stringify(data));
       return data;
     } catch (error) {
       console.error('Error in deleteVoice: ', error);

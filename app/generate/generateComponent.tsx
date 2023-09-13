@@ -64,7 +64,6 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      console.log('data' + JSON.stringify(data));
       if (data) {
         setGenerations(data as Generation[]);
       }
@@ -92,7 +91,6 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
         .eq('user', user.id)
         .single();
       if (error) throw error;
-      console.log('data' + JSON.stringify(data));
       if (data) {
         setVoice(data.id);
       }
