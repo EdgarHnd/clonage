@@ -155,22 +155,24 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
                 <NewGenerationButton />
               </div>
             ) : creditsRemaining > 0 ? (
-              <p className="text-white text-center">
-                You have {creditsRemaining} free credits remaining
-                <Link
-                  className="text-orange-500 hover:text-orange-400"
-                  href="/pricing"
-                >
-                  {' '}
-                  subscribe for unlimited access during the beta
-                </Link>
+              <div className="text-center flex flex-col space-y-4 items-center">
+                <p className="text-white text-center">
+                  You have {creditsRemaining} free credits remaining
+                  <Link
+                    className="text-orange-500 hover:text-orange-400"
+                    href="/pricing"
+                  >
+                    {' '}
+                    subscribe for unlimited access during the beta
+                  </Link>
+                </p>
                 <NewGenerationButton />
-              </p>
+              </div>
             ) : (
               <div className="flex flex-col items-center space-y-4 text-white">
                 <p>you don't have any credits remaining</p>
                 <Link href="/pricing">
-                  <Button className="text-white">subscribe</Button>
+                  <Button variant="outline" className="text-white">subscribe</Button>
                 </Link>
               </div>
             )}
