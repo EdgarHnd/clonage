@@ -164,6 +164,7 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
                   {' '}
                   subscribe for unlimited access during the beta
                 </Link>
+                <NewGenerationButton />
               </p>
             ) : (
               <div className="flex flex-col items-center space-y-4 text-white">
