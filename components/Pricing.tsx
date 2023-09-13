@@ -211,7 +211,7 @@ export default function Pricing({
                 get 10 free credits to try out the app
               </p>
               <p className="mt-8">
-                <span className="text-5xl font-extrabold text-white">0€</span>
+                <span className="text-5xl font-extrabold text-white">$0</span>
               </p>
 
               <Link href="/signin">
