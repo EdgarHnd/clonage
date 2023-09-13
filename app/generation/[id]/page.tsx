@@ -221,8 +221,11 @@ export default function Generation({ params }: { params: { id: string } }) {
           </Link>
           {data?.status != 'completed' ? (
             <>
+              <p className="text-xs text-gray-600">
+              generation takes about 1 minute (if you don't see the outpout, try again with a shorter video and script)
+            </p>
               <Button onClick={handleClick}>
-                {loading ? 'loading...' : 'generate'}
+                {loading ? 'generation...' : 'generate'}
               </Button>
               <p className="text-xs text-red-800">{errorMessage}</p>
             </>

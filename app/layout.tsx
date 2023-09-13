@@ -3,6 +3,7 @@ import Footer from '@/components/ui/Footer';
 import Navbar from '@/components/ui/Navbar';
 import { PropsWithChildren } from 'react';
 import 'styles/main.css';
+import { Analytics } from '@vercel/analytics/react';
 
 const meta = {
   title: 'Clonage - create unlimited videos, just add your script',
@@ -55,6 +56,7 @@ export default function RootLayout({
             className="min-h-[calc(100dvh-4rem)] md:min-h[calc(100dvh-5rem)]"
           >
             {children}
+            <Analytics />
           </main>
           <Footer />
         </SupabaseProvider>
