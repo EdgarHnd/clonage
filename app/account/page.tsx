@@ -89,7 +89,7 @@ export default async function Account() {
             {subscription ? (
               `${subscriptionPrice}/${subscription?.prices?.interval}`
             ) : (
-              <Link href="/"><Button size="lg" variant="secondary">choose your plan</Button></Link>
+              <Link href="/pricing"><Button size="lg" variant="secondary">choose your plan</Button></Link>
             )}
           </div>
         </Card>
