@@ -72,15 +72,15 @@ export default function Footer() {
           </span>
         </div>
         <div className="flex items-center h-10 space-x-6">
-            <a
-              className="flex flex-row items-center justify-center space-x-2 transition duration-150 ease-in-out hover:bg-white bg-slate-100 rounded-full text-black px-3 py-1 text-sm"
+            <Link
+              className="flex flex-row items-center justify-center space-x-2 transition duration-150 ease-in-out hover:bg-white bg-slate-100 rounded-full text-black px-3 py-1 text-sm z-50"
               aria-label="Twitter"
               href="https://twitter.com/edgarhnd"
               target="_blank"
             >
               <p>follow the latest updates</p>
               <TwitterLogoIcon className='w-6 h-6' />
-            </a>
+            </Link>
           </div>
       </div>
     </footer>

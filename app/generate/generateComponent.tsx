@@ -44,10 +44,6 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
     }
   };
 
-  useEffect(() => {
-    fetchCreditsRemaining();
-  }, []);
-
   const [voice, setVoice] = useState<string>('');
 
   const fetchGenerations = async () => {
@@ -110,6 +106,7 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
   useEffect(() => {
     fetchGenerations();
     fetchVoice();
+    fetchCreditsRemaining();
   }, []);
 
   const router = useRouter();
@@ -149,7 +146,7 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
               <div className="text-center flex flex-col space-y-4 items-center">
                 <p>thanks for subscribing!</p>
                 <p>
-                  during beta paying user get unlimited credits (please be
+                  during beta, paying user get unlimited credits (but please be
                   mindfull with the usage though 🙏)
                 </p>
                 <NewGenerationButton />

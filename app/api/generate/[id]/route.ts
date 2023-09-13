@@ -24,6 +24,10 @@ export async function POST(
       throw new Error(creditError.message);
     }
 
+    if (creditData) {
+      console.log('creditData', creditData);
+    }
+
     // Fetch the generation item
     const { data: generation, error: fetchError } = await supabase
       .from('generations')
@@ -185,11 +189,22 @@ export async function POST(
       // Update the credits item
       if (!creditData || creditData.length === 0) {
         console.log('No credits item found');
-      } else if (creditData[0].credits_remaining && creditData[0].credits_used) {
-        await supabase.from('credits').update({
-          credits_remaining: creditData[0].credits_remaining - 1,
-          credits_used: creditData[0].credits_used + 1
-        });
+      } else if (
+        creditData[0].credits_remaining &&
+        creditData[0].credits_used !== null
+      ) {
+        console.log('updating credits', creditData);
+        const newCreditsRemaining = creditData[0].credits_remaining - 1;
+        const newCreditsUsed = creditData[0].credits_used + 1;
+        console.log('credits_remaining', newCreditsRemaining);
+        console.log('credits_used', newCreditsUsed);
+        await supabase
+          .from('credits')
+          .update({
+            credits_remaining: newCreditsRemaining,
+            credits_used: newCreditsUsed
+          })
+          .eq('id', user?.id);
       }
 
       return new Response(JSON.stringify({ output: finalVideoUrl }), {

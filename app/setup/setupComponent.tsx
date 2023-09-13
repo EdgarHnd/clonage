@@ -39,8 +39,7 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
       const { data, error } = await supabase
         .from('voices')
         .select('id')
-        .eq('user', user.id)
-       
+        .eq('user', user.id);
 
       if (error) throw error;
 
@@ -156,7 +155,7 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
                   delete voice
                 </Button>
                 <Link href="/generate">
-                  <Button variant="secondary" >generate video</Button>
+                  <Button variant="secondary">generate video</Button>
                 </Link>
               </div>
               {hasPaid ? (
@@ -180,11 +179,14 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
         ) : (
           <>
             <div className="flex flex-row space-x-6 w-full items-start justify-center">
-              <div className="w-1/2">
+              <div className="w-1/2 flex flex-col space-y-4 items-center">
                 <InputAudio
                   label="original voice"
                   onFileChange={handleAudioFileChange}
                 />
+                <p className="text-sm text-gray-600 w-1/2">
+                  upload a 1min audio or video of yourself talking clearly without background noise
+                </p>
               </div>
               <div className="w-1/2 text-white flex flex-col space-y-4">
                 <Label htmlFor="voiceName">voice name</Label>

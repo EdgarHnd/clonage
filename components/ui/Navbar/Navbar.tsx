@@ -28,7 +28,7 @@ export default async function Navbar() {
             >
               <Logo />
               <p className="text-2xl font-bold text-white ml-3">clonage</p>
-              <p className="relative -top-3 text-xs text-red-500">beta</p>
+              <p className="relative -top-3 -left-2 text-xs text-red-500">beta</p>
             </Link>
             <nav className="hidden ml-6 space-x-2 md:block">
               {user ? (
@@ -42,10 +42,10 @@ export default async function Navbar() {
                 </>
               ) : (
                 <>
-                  <Link href="/" className={s.link}>
-                    features
-                  </Link>
-                  <Link href="/" className={s.link}>
+                 {/*  <Link href="/" className={s.link}>
+                    roadmap
+                  </Link> */}
+                  <Link href="/pricing" className={s.link}>
                     pricing
                   </Link>
                 </>

@@ -8,7 +8,16 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import useSWR, { mutate } from 'swr';
 import { randomString } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
-import { TrashIcon } from '@radix-ui/react-icons';
+import {
+  ArrowLeftIcon,
+  LightningBoltIcon,
+  RocketIcon,
+  SpeakerModerateIcon,
+  TrashIcon
+} from '@radix-ui/react-icons';
+import { Badge } from '@/components/ui/badge';
+import NewGenerationButton from '@/app/generate/newGenerationButton';
+import Link from 'next/link';
 
 export default function Generation({ params }: { params: { id: string } }) {
   const [loading, setLoading] = useState(false);
@@ -18,6 +27,7 @@ export default function Generation({ params }: { params: { id: string } }) {
   const [voice, setVoice] = useState<string>('');
   const supabase = createClientComponentClient();
   const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const { data, error } = useSWR(`/api/generation/${params.id}`, async () => {
     const { data, error } = await supabase
@@ -60,6 +70,7 @@ export default function Generation({ params }: { params: { id: string } }) {
       }
       return data;
     } catch (error) {
+      setErrorMessage(JSON.stringify(error));
       console.error('Error in fetchVoice: ', error);
       throw error;
     }
@@ -74,9 +85,9 @@ export default function Generation({ params }: { params: { id: string } }) {
   };
 
   const runModel = async () => {
-    if (!script) return;
     setLoading(true);
     try {
+      if (!script) throw new Error('No script provided');
       let inputVideoUrl = data?.input_video;
       if (videoFile) {
         // Upload the video file to Supabase storage
@@ -118,15 +129,13 @@ export default function Generation({ params }: { params: { id: string } }) {
       }
 
       // Call the generate route with just the generation id
-      const response = await fetch(`/api/generate/${params.id}`, {
+      await fetch(`/api/generate/${params.id}`, {
         method: 'POST'
       });
-      const responseText = await response.text();
-      console.log(responseText);
-      const { output } = await response.json();
       // After the model run is completed, refetch the data
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      setErrorMessage(error.message);
+      console.log(error.message);
     } finally {
       setLoading(false);
       mutate(`/api/generation/${params.id}`);
@@ -179,7 +188,7 @@ export default function Generation({ params }: { params: { id: string } }) {
               upload a video of you talking or standing still (max 10s)
             </p>
           </div>
-          <div className="flex flex-col space-y-4 md:w-1/2 w-full text-white h-[300px]">
+          <div className="flex flex-col items-start space-y-4 md:w-1/2 w-full text-white h-[300px]">
             <Label htmlFor="script">script</Label>
             <Textarea
               disabled={data?.status == 'completed'}
@@ -189,22 +198,36 @@ export default function Generation({ params }: { params: { id: string } }) {
               className=" w-full h-full p-4"
               placeholder="type your video script here."
             />
+            <Badge variant="secondary">
+              tips: try writing in another language
+              <LightningBoltIcon />
+            </Badge>
           </div>
         </div>
         <>{renderOutput()}</>
         <div className="flex flex-row space-x-4 items-center mt-12">
           <Button
-            variant="destructive"
+            variant="ghost"
             size="icon"
-            className="text-xs"
+            className="text-xs hover:bg-red-500"
             onClick={handleDelete}
           >
             <TrashIcon />
           </Button>
-          {data?.status != 'completed' && (
-            <Button onClick={handleClick}>
-              {loading ? 'loading...' : 'generate'}
+          <Link href="/generate">
+            <Button variant="ghost" size="icon" className="text-xs">
+              <ArrowLeftIcon />
             </Button>
+          </Link>
+          {data?.status != 'completed' ? (
+            <>
+              <Button onClick={handleClick}>
+                {loading ? 'loading...' : 'generate'}
+              </Button>
+              <p className="text-xs text-red-800">{errorMessage}</p>
+            </>
+          ) : (
+            <NewGenerationButton />
           )}
         </div>
       </div>

@@ -28,26 +28,26 @@ export default function CollapsibleMenu({ user }: CollapsibleMenuProps) {
       >
         {user ? (
           <>
-            <Link href="/setup" className="">
+            <Link onClick={toggleMenu} href="/setup" className="">
               setup
             </Link>
-            <Link href="/generate" className="">
+            <Link onClick={toggleMenu} href="/generate" className="">
               generate
             </Link>
-            <Link href="/account" className="">
+            <Link onClick={toggleMenu} href="/account" className="">
               account
             </Link>
             <SignOutButton />
           </>
         ) : (
           <>
-            <Link href="/" className="">
-              features
-            </Link>
-            <Link href="/" className="">
+            {/* <Link onClick={toggleMenu} href="/" className="">
+              roadmap
+            </Link> */}
+            <Link onClick={toggleMenu} href="/pricing" className="">
               pricing
             </Link>
-            <Link href="/signin" className="">
+            <Link onClick={toggleMenu} href="/signin" className="">
               sign in
             </Link>
           </>
