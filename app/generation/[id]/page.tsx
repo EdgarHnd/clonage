@@ -44,6 +44,7 @@ export default function Generation({ params }: { params: { id: string } }) {
       } = await supabase.auth.getUser();
 
       if (!user?.id) {
+        router.push('/signin');
         throw new Error('User not found');
       }
 
@@ -124,11 +125,11 @@ export default function Generation({ params }: { params: { id: string } }) {
       console.log(responseText);
       const { output } = await response.json();
       // After the model run is completed, refetch the data
-      mutate(`/api/generation/${params.id}`);
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false);
+      mutate(`/api/generation/${params.id}`);
     }
   };
 
@@ -154,9 +155,9 @@ export default function Generation({ params }: { params: { id: string } }) {
     if (output) {
       return (
         <div className="flex flex-row space-x-6 w-full items-start justify-center">
-          <div className="flex flex-col space-y-4 w-1/2 text-white">
+          <div className="flex flex-col space-y-4 md:w-1/2 w-full text-white">
             <Label htmlFor="output">output</Label>
-            <video src={output} controls />
+            <video className="rounded" src={output} controls />
           </div>
         </div>
       );
@@ -166,21 +167,24 @@ export default function Generation({ params }: { params: { id: string } }) {
   return (
     <div className="max-w-6xl px-4 py-8 mx-auto sm:py-24 sm:px-6 lg:px-8">
       <div className="flex flex-col items-center space-y-12">
-        <div className="flex flex-row space-x-6 w-full items-start justify-center">
-          <div className="w-1/2">
+        <div className="flex md:flex-row flex-col md:space-x-6 w-full items-start justify-center">
+          <div className="md:w-1/2 w-full flex flex-col space-y-4 items-center">
             <InputVideo
               disabled={data?.status == 'completed'}
               label="reference video"
               onFileChange={handleVideoFileChange}
               existingUrl={data?.input_video}
             />
+            <p className="text-sm text-gray-600">
+              upload a video of you talking or standing still (max 10s)
+            </p>
           </div>
-          <div className="flex flex-col space-y-4 w-1/2 text-white h-[300px]">
+          <div className="flex flex-col space-y-4 md:w-1/2 w-full text-white h-[300px]">
             <Label htmlFor="script">script</Label>
             <Textarea
               disabled={data?.status == 'completed'}
               id="script"
-              value={script}
+              value={script || ''}
               onChange={(e) => setScript(e.target.value)}
               className=" w-full h-full p-4"
               placeholder="type your video script here."

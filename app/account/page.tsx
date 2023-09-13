@@ -4,7 +4,7 @@ import {
   getUserDetails,
   getSubscription
 } from '@/app/supabase-server';
-import {Button} from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { Database } from '@/lib/database.types';
 import { createServerActionClient } from '@supabase/auth-helpers-nextjs';
 import { revalidatePath } from 'next/cache';
@@ -68,20 +68,20 @@ export default async function Account() {
       <div className="max-w-6xl px-4 py-8 mx-auto sm:px-6 sm:pt-24 lg:px-8">
         <div className="sm:align-center sm:flex sm:flex-col">
           <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
-            Account
+            account
           </h1>
           <p className="max-w-2xl m-auto mt-5 text-xl text-zinc-200 sm:text-center sm:text-2xl">
-            We partnered with Stripe for a simplified billing.
+            we partnered with Stripe for a simplified billing.
           </p>
         </div>
       </div>
       <div className="p-4">
         <Card
-          title="Your Plan"
+          title="your plan"
           description={
             subscription
-              ? `You are currently on the ${subscription?.prices?.products?.name} plan.`
-              : 'You are not currently subscribed to any plan.'
+              ? `you are currently on the ${subscription?.prices?.products?.name} plan.`
+              : 'you are not currently subscribed to any plan.'
           }
           footer={<ManageSubscriptionButton session={session} />}
         >
@@ -89,13 +89,13 @@ export default async function Account() {
             {subscription ? (
               `${subscriptionPrice}/${subscription?.prices?.interval}`
             ) : (
-              <Link href="/">Choose your plan</Link>
+              <Link href="/"><Button size="lg" variant="secondary">choose your plan</Button></Link>
             )}
           </div>
         </Card>
         <Card
-          title="Your Name"
-          description="Please enter your full name, or a display name you are comfortable with."
+          title="your name"
+          description="please enter your full name, or a display name you are comfortable with."
           footer={
             <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center">
               <p className="pb-4 sm:pb-0">64 characters maximum</p>
@@ -106,7 +106,7 @@ export default async function Account() {
                 disabled={false}
               >
                 {/* WARNING - In Next.js 13.4.x server actions are in alpha and should not be used in production code! */}
-                Update Name
+                update name
               </Button>
             </div>
           }
@@ -118,19 +118,19 @@ export default async function Account() {
                 name="name"
                 className="w-1/2 p-3 rounded-md bg-zinc-800"
                 defaultValue={userDetails?.full_name ?? ''}
-                placeholder="Your name"
+                placeholder="your name"
                 maxLength={64}
               />
             </form>
           </div>
         </Card>
         <Card
-          title="Your Email"
-          description="Please enter the email address you want to use to login."
+          title="your email"
+          description="please enter the email address you want to use to login."
           footer={
             <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center">
               <p className="pb-4 sm:pb-0">
-                We will email you to verify the change.
+                we will email you to verify the change.
               </p>
               <Button
                 /* variant="slim" */
@@ -151,7 +151,7 @@ export default async function Account() {
                 name="email"
                 className="w-1/2 p-3 rounded-md bg-zinc-800"
                 defaultValue={user ? user.email : ''}
-                placeholder="Your email"
+                placeholder="your email"
                 maxLength={64}
                 disabled={true}
               />

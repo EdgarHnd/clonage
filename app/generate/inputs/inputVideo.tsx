@@ -28,10 +28,10 @@ export function InputVideo({ onFileChange, label, existingUrl, disabled }: Input
   };
 
   return (
-    <div className="grid w-full space-y-4 max-w-sm items-center justify-center gap-1.5 text-white">
+    <div className="flex flex-col w-full space-y-4 max-w-sm items-start justify-center text-white">
       <Label htmlFor="videoInput">{label}</Label>
       <Input disabled={disabled} id="videoInput" type="file" onChange={handleChange} />
-      {fileUrl && <video src={fileUrl} controls />}
+      {fileUrl && <video className="rounded" src={fileUrl} controls />}
     </div>
   )
 }

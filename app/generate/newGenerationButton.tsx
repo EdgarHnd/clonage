@@ -45,7 +45,7 @@ const NewGenerationButton = () => {
   };
 
   return (
-    <Button disabled={loading} className="" onClick={handleCreateGeneration}>
+    <Button disabled={loading} variant="secondary" onClick={handleCreateGeneration}>
       {loading ? 'loading...' : 'create new'}
     </Button>
   );

@@ -15,7 +15,7 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-export default function SetupComponent() {
+export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
   const [loading, setLoading] = useState(false);
   const [output, setOutput] = useState<any>(null);
   const [voice, setVoice] = useState<string>(''); // Renamed state variable
@@ -40,12 +40,14 @@ export default function SetupComponent() {
         .from('voices')
         .select('id')
         .eq('user', user.id)
-        .single();
+       
 
       if (error) throw error;
 
-      if (data) {
-        setVoice(data.id);
+      if (data.length > 0) {
+        setVoice(data[0].id);
+      } else {
+        setVoice('');
       }
       return data;
     } catch (error) {
@@ -136,32 +138,43 @@ export default function SetupComponent() {
     }
   };
 
-
   return (
     <div className="max-w-6xl px-4 py-8 mx-auto sm:py-24 sm:px-6 lg:px-8">
       <div className="flex flex-col items-center space-y-12">
         <h1 className="text-white text-2xl font-bold">voice cloning</h1>
         {voice ? (
-          <Card className="flex flex-col items-center bg-black">
+          <Card className="flex flex-col items-center bg-black border-gray-600">
             <CardHeader>
               <h2 className="text-white text-lg font-bold">personal voice</h2>
             </CardHeader>
             <CardContent>
-              <p className="text-white">you already have a voice </p>
+              <p className="text-white">your voice is setup</p>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
-              <Button variant="destructive" onClick={deleteVoice}>
-                delete voice
-              </Button>
-              <p className="text-white text-sm">
-                on free plan, all voices are deleted after 1h
-                <Link
-                  href="/pricing"
-                  className="text-orange-500 hover:text-orange-300 ml-1"
-                >
-                  (upgrade)
+              <div className="flex flex-row space-x-6 w-full items-center justify-center">
+                <Button size="sm" variant="destructive" onClick={deleteVoice}>
+                  delete voice
+                </Button>
+                <Link href="/generate">
+                  <Button variant="secondary" >generate video</Button>
                 </Link>
-              </p>
+              </div>
+              {hasPaid ? (
+                <p className="text-white text-sm">
+                  thanks for subscribing, during beta only one voice can be
+                  saved
+                </p>
+              ) : (
+                <p className="text-white text-sm">
+                  on free plan, all voices are deleted after 1h
+                  <Link
+                    href="/pricing"
+                    className="text-orange-500 hover:text-orange-300 ml-1"
+                  >
+                    (upgrade)
+                  </Link>
+                </p>
+              )}
             </CardFooter>
           </Card>
         ) : (

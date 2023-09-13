@@ -1,6 +1,6 @@
 'use client';
 
-import {Button} from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { postData } from '@/utils/helpers';
 
 import { Session } from '@supabase/supabase-js';
@@ -25,13 +25,13 @@ export default function ManageSubscriptionButton({ session }: Props) {
 
   return (
     <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center">
-      <p className="pb-4 sm:pb-0">Manage your subscription on Stripe.</p>
+      <p className="pb-4 sm:pb-0">manage your subscription on Stripe.</p>
       <Button
-/*         variant="slim"
- */        disabled={!session}
+        variant="default"
+        disabled={!session}
         onClick={redirectToCustomerPortal}
       >
-        Open customer portal
+        open customer portal
       </Button>
     </div>
   );

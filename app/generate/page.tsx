@@ -8,11 +8,13 @@ import { redirect } from 'next/navigation';
 import GenerateComponent from './generateComponent';
 
 export default async function Account() {
-  const [session] = await Promise.all([getSession()]);
+  const [session, subscription] = await Promise.all([getSession(), getSubscription()]);
 
   if (!session) {
     return redirect('/signin');
   }
 
-  return <GenerateComponent />;
+  const hasPaid = Boolean(subscription?.status === 'active');
+
+  return <GenerateComponent hasPaid={hasPaid} />;
 }

@@ -5,6 +5,7 @@ import Logo from '@/components/icons/Logo';
 import SignOutButton from './SignOutButton';
 
 import s from './Navbar.module.css';
+import CollapsibleMenu from './CollapsibleMenu';
 
 export default async function Navbar() {
   const supabase = createServerSupabaseClient();
@@ -17,14 +18,19 @@ export default async function Navbar() {
       <a href="#skip" className="sr-only focus:not-sr-only">
         Skip to content
       </a>
-      <div className="max-w-6xl px-6 mx-auto">
+      <div className="max-w-6xl md:px-6 px-4 mx-auto">
         <div className="relative flex flex-row justify-between py-4 align-center md:py-6">
-          <div className="flex items-center flex-1">
-            <Link href="/" className="flex flex-row items-center" aria-label="Logo">
+          <div className="flex items-center">
+            <Link
+              href="/"
+              className="flex flex-row items-center"
+              aria-label="Logo"
+            >
               <Logo />
               <p className="text-2xl font-bold text-white ml-3">clonage</p>
+              <p className="relative -top-3 text-xs text-red-500">beta</p>
             </Link>
-            <nav className="hidden ml-6 space-x-2 lg:block">
+            <nav className="hidden ml-6 space-x-2 md:block">
               {user ? (
                 <>
                   <Link href="/setup" className={s.link}>
@@ -46,7 +52,10 @@ export default async function Navbar() {
               )}
             </nav>
           </div>
-          <div className="flex justify-end flex-1 space-x-8">
+          <div className="flex justify-end flex-1">
+            <CollapsibleMenu user={user} />
+          </div>
+          <div className=" justify-end flex-1 space-x-8 md:flex hidden">
             {user ? (
               <>
                 <Link href="/account" className={s.link}>

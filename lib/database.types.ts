@@ -9,6 +9,34 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      credits: {
+        Row: {
+          created_at: string
+          credits_remaining: number | null
+          credits_used: number | null
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          credits_remaining?: number | null
+          credits_used?: number | null
+          id: string
+        }
+        Update: {
+          created_at?: string
+          credits_remaining?: number | null
+          credits_used?: number | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credits_id_fkey"
+            columns: ["id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       customers: {
         Row: {
           id: string
@@ -30,6 +58,39 @@ export interface Database {
             referencedColumns: ["id"]
           }
         ]
+      }
+      features: {
+        Row: {
+          created_at: string
+          description: string | null
+          down: number | null
+          id: number
+          name: string | null
+          status: string | null
+          target_date: string | null
+          up: number | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          down?: number | null
+          id?: number
+          name?: string | null
+          status?: string | null
+          target_date?: string | null
+          up?: number | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          down?: number | null
+          id?: number
+          name?: string | null
+          status?: string | null
+          target_date?: string | null
+          up?: number | null
+        }
+        Relationships: []
       }
       generations: {
         Row: {
@@ -260,6 +321,7 @@ export interface Database {
           description: string | null
           id: string
           name: string | null
+          status: string | null
           user: string | null
         }
         Insert: {
@@ -267,6 +329,7 @@ export interface Database {
           description?: string | null
           id: string
           name?: string | null
+          status?: string | null
           user?: string | null
         }
         Update: {
@@ -274,6 +337,7 @@ export interface Database {
           description?: string | null
           id?: string
           name?: string | null
+          status?: string | null
           user?: string | null
         }
         Relationships: [
