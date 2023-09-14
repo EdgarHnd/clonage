@@ -30,7 +30,7 @@ export default function LandingPage() {
           <div className="mt-10 flex items-center justify-center gap-x-6">
             <Link href="/signin">
               <Button variant="secondary" size="lg">
-                Get started
+                get started
               </Button>
             </Link>
           </div>
