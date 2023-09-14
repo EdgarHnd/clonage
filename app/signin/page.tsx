@@ -9,7 +9,7 @@ export default async function SignIn() {
   console.log('session', session);
 
   if (session) {
-    return redirect('/account');
+    return redirect('/generate');
   }
 
   return (
