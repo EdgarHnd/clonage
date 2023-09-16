@@ -214,14 +214,14 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
                   className=" w-full h-full p-4"
                   placeholder="enter voice name."
                 />
-                <Label htmlFor="voiceDescription">voice description</Label>
+                {/* <Label htmlFor="voiceDescription">voice description</Label>
                 <Textarea
                   id="voiceDescription"
                   value={voiceDescription}
                   onChange={(e) => setVoiceDescription(e.target.value)}
                   className=" w-full h-full p-4"
                   placeholder="enter voice description."
-                />
+                /> */}
               </div>
             </div>
             <Button className="mt-12" onClick={handleClick}>
