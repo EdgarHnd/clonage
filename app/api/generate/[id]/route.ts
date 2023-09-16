@@ -216,7 +216,9 @@ export async function POST(
         .from('generations')
         .update({ status: 'failed' })
         .eq('id', params.id);
-      return new Response(`Server Error: ${err.message}`, { status: 400 });
+      return new Response(JSON.stringify({ message: err.message }), {
+        status: 400
+      });
     }
   } else {
     return new Response('Method Not Allowed', { status: 405 });

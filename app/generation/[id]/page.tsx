@@ -129,9 +129,14 @@ export default function Generation({ params }: { params: { id: string } }) {
       }
 
       // Call the generate route with just the generation id
-      await fetch(`/api/generate/${params.id}`, {
+      const response = await fetch(`/api/generate/${params.id}`, {
         method: 'POST'
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'an error occurred during video generation');
+      }
       // After the model run is completed, refetch the data
     } catch (error: any) {
       setErrorMessage(error.message);
