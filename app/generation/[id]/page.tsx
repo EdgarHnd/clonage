@@ -135,7 +135,9 @@ export default function Generation({ params }: { params: { id: string } }) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'an error occurred during video generation');
+        throw new Error(
+          errorData.message || 'an error occurred during video generation'
+        );
       }
       // After the model run is completed, refetch the data
     } catch (error: any) {
@@ -196,6 +198,7 @@ export default function Generation({ params }: { params: { id: string } }) {
           <div className="flex flex-col items-start space-y-4 md:w-1/2 w-full text-white h-[300px]">
             <Label htmlFor="script">script</Label>
             <Textarea
+              maxLength={300}
               disabled={data?.status == 'completed'}
               id="script"
               value={script || ''}
