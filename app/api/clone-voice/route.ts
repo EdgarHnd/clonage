@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     ) as unknown as string;
     const audioFile: File = inputData.get('audioFile') as unknown as File;
 
-    if (!voiceName || !voiceDescription || !audioFile) {
+    if (!voiceName || !audioFile) {
       return new Response('Missing required fields', { status: 400 });
     }
     console.log(voiceName, voiceDescription, audioFile.name);
@@ -57,7 +57,7 @@ export async function POST(req: Request) {
         {
           id: voice_id,
           name: voiceName,
-          description: voiceDescription,
+          description: voiceDescription || '',
           user: user?.id
         }
       ]);

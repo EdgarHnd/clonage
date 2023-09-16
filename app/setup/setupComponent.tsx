@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/card';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { UpdateIcon } from '@radix-ui/react-icons';
 
 export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
   const [loading, setLoading] = useState(false);
@@ -23,6 +24,7 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
   const [voiceName, setVoiceName] = useState<string>('');
   const [voiceDescription, setVoiceDescription] = useState<string>('');
   const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const fetchVoice = async () => {
     setLoading(true);
@@ -49,8 +51,9 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
         setVoice('');
       }
       return data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error in fetchVoice: ', error);
+      setErrorMessage(error.message);
       throw error;
     } finally {
       setLoading(false);
@@ -68,7 +71,15 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
   };
 
   const handleClick = async () => {
-    if (!audioFile || !voiceName || !voiceDescription) return;
+    setErrorMessage(''); // Reset the error message before each operation
+    if (!audioFile) {
+      setErrorMessage('Audio file is missing. Please upload an audio file.');
+      return;
+    }
+    if (!voiceName) {
+      setErrorMessage('Voice name is missing. Please enter a voice name.');
+      return;
+    }
     try {
       setLoading(true);
       const data = new FormData();
@@ -83,7 +94,7 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
         console.log('response' + JSON.stringify(response));
       }
     } catch (error: any) {
-      console.error(error);
+      setErrorMessage(error.message);
     } finally {
       setLoading(false);
       fetchVoice();
@@ -149,7 +160,14 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
             <CardFooter className="flex flex-col space-y-4">
               <div className="flex flex-row space-x-6 w-full items-center justify-center">
                 <Button size="sm" variant="destructive" onClick={deleteVoice}>
-                  delete voice
+                  {loading ? (
+                    <>
+                      deleting voice{' '}
+                      <UpdateIcon className="animate-spin ml-1" />
+                    </>
+                  ) : (
+                    'delete voice'
+                  )}
                 </Button>
                 <Link href="/generate">
                   <Button variant="secondary">generate video</Button>
@@ -175,17 +193,19 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
           </Card>
         ) : (
           <>
-            <div className="flex flex-row space-x-6 w-full items-start justify-center">
-              <div className="w-1/2 flex flex-col space-y-4 items-center">
+            <div className="flex flex-col md:flex-row md:space-x-6 w-full items-start justify-center">
+              <div className="md:w-1/2 w-full flex flex-col space-y-4 items-center">
                 <InputAudio
+                  setErrorMessage={setErrorMessage}
                   label="original voice"
                   onFileChange={handleAudioFileChange}
                 />
-                <p className="text-sm text-gray-600 w-1/2">
-                  upload a 1min audio or video of yourself talking clearly without background noise
+                <p className="text-sm text-gray-600 md:w-1/2">
+                  upload a 1min audio or video of yourself talking clearly
+                  without background noise
                 </p>
               </div>
-              <div className="w-1/2 text-white flex flex-col space-y-4">
+              <div className="w-full md:w-1/2 text-white flex flex-col space-y-4 md:mt-0 mt-4">
                 <Label htmlFor="voiceName">voice name</Label>
                 <Input
                   id="voiceName"
@@ -205,8 +225,15 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
               </div>
             </div>
             <Button className="mt-12" onClick={handleClick}>
-              {loading ? 'loading...' : 'clone voice'}
+              {loading ? (
+                <>
+                  cloning voice <UpdateIcon className="animate-spin ml-1" />
+                </>
+              ) : (
+                'clone voice'
+              )}
             </Button>
+            <p className="text-xs text-red-800">{errorMessage}</p>
           </>
         )}
       </div>

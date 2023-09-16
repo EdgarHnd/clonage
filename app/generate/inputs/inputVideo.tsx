@@ -1,7 +1,7 @@
 // components/ui/InputFile/inputfile.tsx
 import { useState } from 'react';
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface InputVideoProps {
   onFileChange: (file: File | null) => void;
@@ -10,7 +10,12 @@ interface InputVideoProps {
   disabled?: boolean;
 }
 
-export function InputVideo({ onFileChange, label, existingUrl, disabled }: InputVideoProps) {
+export function InputVideo({
+  onFileChange,
+  label,
+  existingUrl,
+  disabled
+}: InputVideoProps) {
   const [fileUrl, setFileUrl] = useState<string | null>(null);
 
   if (existingUrl && !fileUrl) {
@@ -30,8 +35,14 @@ export function InputVideo({ onFileChange, label, existingUrl, disabled }: Input
   return (
     <div className="flex flex-col w-full space-y-4 max-w-sm items-start justify-center text-white">
       <Label htmlFor="videoInput">{label}</Label>
-      <Input disabled={disabled} id="videoInput" type="file" onChange={handleChange} />
+      <Input
+        disabled={disabled}
+        id="videoInput"
+        type="file"
+        onChange={handleChange}
+        accept="video/*,image/*"
+      />
       {fileUrl && <video className="rounded" src={fileUrl} controls />}
     </div>
-  )
+  );
 }
