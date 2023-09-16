@@ -205,39 +205,45 @@ export default function Generation({ params }: { params: { id: string } }) {
           </div>
         </div>
         <>{renderOutput()}</>
-        <div className="flex flex-row space-x-4 items-start mt-12">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-xs hover:bg-red-500"
-            onClick={handleDelete}
-          >
-            <TrashIcon />
-          </Button>
-          <Link href="/generate">
-            <Button variant="ghost" size="icon" className="text-xs">
-              <ArrowLeftIcon />
+        <div className="flex flex-col w-full items-center space-y-2">
+          <div className="flex flex-row space-x-4 items-start mt-12">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-xs hover:bg-red-500"
+              onClick={handleDelete}
+            >
+              <TrashIcon />
             </Button>
-          </Link>
-          {data?.status != 'completed' ? (
-            <div className="flex flex-col items-center space-y-2">
-              <Button onClick={handleClick}>
-                {loading ? (
-                  <>
-                    generating <CommitIcon className="animate-spin ml-1" />
-                  </>
-                ) : (
-                  'generate'
-                )}
+            <Link href="/generate">
+              <Button variant="ghost" size="icon" className="text-xs">
+                <ArrowLeftIcon />
               </Button>
+            </Link>
+            {data?.status != 'completed' ? (
+              <div className="flex flex-col items-center space-y-2">
+                <Button onClick={handleClick}>
+                  {loading ? (
+                    <>
+                      generating <CommitIcon className="animate-spin ml-1" />
+                    </>
+                  ) : (
+                    'generate'
+                  )}
+                </Button>
+              </div>
+            ) : (
+              <NewGenerationButton />
+            )}
+          </div>
+          {data?.status != 'completed' && (
+            <>
               <p className="text-xs text-gray-600">
                 generation takes about 1 minute (if you don't see the outpout,
                 try again with a shorter video and script)
               </p>
               <p className="text-xs text-red-800">{errorMessage}</p>
-            </div>
-          ) : (
-            <NewGenerationButton />
+            </>
           )}
         </div>
       </div>
