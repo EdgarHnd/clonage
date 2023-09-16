@@ -10,6 +10,7 @@ import { randomString } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import {
   ArrowLeftIcon,
+  CommitIcon,
   LightningBoltIcon,
   RocketIcon,
   SpeakerModerateIcon,
@@ -41,7 +42,6 @@ export default function Generation({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     if (!data) return;
-    console.log('data' + JSON.stringify(data));
     setVoice(data.voice);
     setScript(data.input_text);
     setOutput(data.output_video);
@@ -64,7 +64,6 @@ export default function Generation({ params }: { params: { id: string } }) {
         .eq('user', user.id)
         .single();
       if (error) throw error;
-      console.log('data' + JSON.stringify(data));
       if (data) {
         setVoice(data.id);
       }
@@ -86,6 +85,7 @@ export default function Generation({ params }: { params: { id: string } }) {
 
   const runModel = async () => {
     setLoading(true);
+    setErrorMessage('');
     try {
       if (!script) throw new Error('No script provided');
       let inputVideoUrl = data?.input_video;
@@ -205,7 +205,7 @@ export default function Generation({ params }: { params: { id: string } }) {
           </div>
         </div>
         <>{renderOutput()}</>
-        <div className="flex flex-row space-x-4 items-center mt-12">
+        <div className="flex flex-row space-x-4 items-start mt-12">
           <Button
             variant="ghost"
             size="icon"
@@ -220,15 +220,22 @@ export default function Generation({ params }: { params: { id: string } }) {
             </Button>
           </Link>
           {data?.status != 'completed' ? (
-            <>
-              <p className="text-xs text-gray-600">
-              generation takes about 1 minute (if you don't see the outpout, try again with a shorter video and script)
-            </p>
+            <div className="flex flex-col items-center space-y-2">
               <Button onClick={handleClick}>
-                {loading ? 'generation...' : 'generate'}
+                {loading ? (
+                  <>
+                    generating <CommitIcon className="animate-spin ml-1" />
+                  </>
+                ) : (
+                  'generate'
+                )}
               </Button>
+              <p className="text-xs text-gray-600">
+                generation takes about 1 minute (if you don't see the outpout,
+                try again with a shorter video and script)
+              </p>
               <p className="text-xs text-red-800">{errorMessage}</p>
-            </>
+            </div>
           ) : (
             <NewGenerationButton />
           )}
