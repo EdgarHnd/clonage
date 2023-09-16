@@ -15,7 +15,6 @@ export function InputAudio({
   label,
   setErrorMessage
 }: InputAudioProps) {
-  const [fileUrl, setFileUrl] = useState<string | null>(null);
   const inputFileRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,7 +34,6 @@ export function InputAudio({
         onFileChange(null);
         return;
       } else {
-        setFileUrl(URL.createObjectURL(file));
         onFileChange(file); // pass the file to the parent component
       }
     } else {
@@ -43,10 +41,18 @@ export function InputAudio({
     }
   };
 
+  const handleClick = () => {
+    if (inputFileRef.current) {
+      inputFileRef.current.click();
+    }
+  };
+
   return (
     <div className="grid w-full space-y-4 max-w-sm items-center justify-center gap-1.5 text-white">
-      <Label htmlFor="audioInput">{label}</Label>
-      <div className="border-dashed border-2 border-gray-400 py-6 px-4 rounded-md text-center cursor-pointer hover:border-white transition-colors duration-200">
+      <div
+        onClick={handleClick}
+        className="border-dashed border-2 border-gray-400 py-6 px-4 rounded-md text-center cursor-pointer hover:border-white transition-colors duration-200"
+      >
         <UploadIcon className="mx-auto mb-2 text-gray-400" />
         <Input
           ref={inputFileRef}
@@ -57,12 +63,11 @@ export function InputAudio({
           className="hidden" // hide the default input
         />
         <Label htmlFor="audioInput" className="text-gray-400 cursor-pointer">
-          {fileUrl
-            ? fileUrl.split('/').pop()
-            : 'click or drop your audio sample here'}
+          {inputFileRef.current && inputFileRef.current.files?.length
+            ? inputFileRef.current.files[0].name
+            : 'click to upload your sample'}
         </Label>
       </div>
-      {fileUrl && <audio src={fileUrl} controls />}
     </div>
   );
 }

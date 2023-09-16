@@ -15,6 +15,7 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { UpdateIcon } from '@radix-ui/react-icons';
+import { AudioRecorder } from 'react-audio-voice-recorder';
 
 export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
   const [loading, setLoading] = useState(false);
@@ -25,6 +26,7 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
   const [voiceDescription, setVoiceDescription] = useState<string>('');
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
   const fetchVoice = async () => {
     setLoading(true);
@@ -67,6 +69,7 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
   const handleAudioFileChange = (newFile: File | null) => {
     if (newFile) {
       setAudioFile(newFile);
+      setAudioUrl(URL.createObjectURL(newFile));
     }
   };
 
@@ -145,6 +148,16 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
     }
   };
 
+  const handleAudioRecorded = (newBlob: Blob | null) => {
+    if (newBlob) {
+      console.log('newBlob' + JSON.stringify(newBlob));
+      const newFile = new File([newBlob], 'recorded_audio.webm', {
+        type: 'audio/webm'
+      });
+      handleAudioFileChange(newFile);
+    }
+  };
+
   return (
     <div className="max-w-6xl px-4 py-8 mx-auto sm:py-24 sm:px-6 lg:px-8">
       <div className="flex flex-col items-center space-y-12">
@@ -194,16 +207,30 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
         ) : (
           <>
             <div className="flex flex-col md:flex-row md:space-x-6 w-full items-start justify-center">
-              <div className="md:w-1/2 w-full flex flex-col space-y-4 items-center">
+              <div className="md:w-1/2 w-full flex flex-col space-y-4 items-center text-center">
+                <p className="text-sm text-gray-600 md:w-1/2">
+                  record a voice sample (30s)
+                </p>
+
+                <AudioRecorder
+                  onRecordingComplete={handleAudioRecorded}
+                  audioTrackConstraints={{
+                    noiseSuppression: true,
+                    echoCancellation: true
+                  }}
+                  showVisualizer={true}
+                  downloadFileExtension="webm"
+                />
+                <p className="text-sm text-gray-600 md:w-1/2">
+                  or upload an audio or video of yourself talking clearly
+                  without background noise (max size 11MB)
+                </p>
                 <InputAudio
                   setErrorMessage={setErrorMessage}
                   label="original voice"
                   onFileChange={handleAudioFileChange}
                 />
-                <p className="text-sm text-gray-600 md:w-1/2">
-                  upload an audio or video of yourself talking clearly
-                  without background noise (max size 11MB)
-                </p>
+                {audioUrl && <audio src={audioUrl} controls />}
               </div>
               <div className="w-full md:w-1/2 text-white flex flex-col space-y-4 md:mt-0 mt-4">
                 <Label htmlFor="voiceName">voice name</Label>

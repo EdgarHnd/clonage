@@ -26,6 +26,7 @@
         "encoding": "^0.1.13",
         "next": "13.4.19",
         "react": "^18.2.0",
+        "react-audio-voice-recorder": "^2.1.2",
         "react-dom": "^18.2.0",
         "react-merge-refs": "^2.0.2",
         "replicate": "^0.16.1",
