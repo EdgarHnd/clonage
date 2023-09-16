@@ -54,7 +54,7 @@ export function InputAudio({
           type="file"
           accept="audio/*,video/*"
           onChange={handleChange}
-          className="sr-only" // hide the default input
+          className="hidden" // hide the default input
         />
         <Label htmlFor="audioInput" className="text-gray-400 cursor-pointer">
           {fileUrl

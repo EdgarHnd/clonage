@@ -201,8 +201,8 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
                   onFileChange={handleAudioFileChange}
                 />
                 <p className="text-sm text-gray-600 md:w-1/2">
-                  upload a 1min audio or video of yourself talking clearly
-                  without background noise
+                  upload an audio or video of yourself talking clearly
+                  without background noise (max size 11MB)
                 </p>
               </div>
               <div className="w-full md:w-1/2 text-white flex flex-col space-y-4 md:mt-0 mt-4">
