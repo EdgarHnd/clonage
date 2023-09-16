@@ -155,17 +155,17 @@ export default function Generation({ params }: { params: { id: string } }) {
   };
 
   const handleDelete = async () => {
-    const { error: deleteError } = await supabase
+    const { error: updateError } = await supabase
       .from('generations')
-      .delete()
+      .update({ status: 'deleted' })
       .eq('id', params.id);
-    if (deleteError) {
-      throw deleteError;
+    if (updateError) {
+      throw updateError;
     } else {
       router.push('/generate');
     }
   };
-
+  
   const renderOutput = () => {
     if (!output) return null;
     if (output) {

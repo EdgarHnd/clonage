@@ -61,6 +61,7 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
         .from('generations')
         .select('*')
         .eq('user', user.id)
+        .filter('status', 'neq', 'deleted')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
