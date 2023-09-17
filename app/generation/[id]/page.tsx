@@ -165,7 +165,7 @@ export default function Generation({ params }: { params: { id: string } }) {
       router.push('/generate');
     }
   };
-  
+
   const renderOutput = () => {
     if (!output) return null;
     if (output) {
@@ -191,9 +191,10 @@ export default function Generation({ params }: { params: { id: string } }) {
               onFileChange={handleVideoFileChange}
               existingUrl={data?.input_video}
             />
-            <p className="text-sm text-gray-600">
-              upload a video of you talking or standing still (max 10s)
-            </p>
+            <Badge className="text-sm text-gray-200">
+              upload a horizontal video of you looking at the camera (max 10s)
+              ✨
+            </Badge>
           </div>
           <div className="flex flex-col items-start space-y-4 md:w-1/2 w-full text-white h-[300px]">
             <Label htmlFor="script">script</Label>
@@ -204,11 +205,10 @@ export default function Generation({ params }: { params: { id: string } }) {
               value={script || ''}
               onChange={(e) => setScript(e.target.value)}
               className=" w-full h-full p-4"
-              placeholder="type your video script here."
+              placeholder="type your video script here"
             />
             <Badge variant="secondary">
-              tips: try writing in another language
-              <LightningBoltIcon />
+              tips: try writing in another language 🔥
             </Badge>
           </div>
         </div>
@@ -246,9 +246,16 @@ export default function Generation({ params }: { params: { id: string } }) {
           </div>
           {data?.status != 'completed' && (
             <>
-              <p className="text-xs text-gray-600">
-                generation takes about 1 minute (if you don't see the outpout,
-                try again with a shorter video and script)
+              <p className="text-sm text-gray-500">
+                generation takes arround 1 minute (if you don't see the outpout,{' '}
+                <Link
+                  href="https://x.com/edgarhnd"
+                  className="hover:text-white"
+                  target="blank"
+                >
+                  let me know on twitter @edgarhnd
+                </Link>
+                )
               </p>
               <p className="text-xs text-red-800">{errorMessage}</p>
             </>
