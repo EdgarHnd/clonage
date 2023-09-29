@@ -211,7 +211,29 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
                 <p className="text-sm text-gray-600 md:w-1/2">
                   record a voice sample (30s)
                 </p>
-
+                <div className="">
+                  <p>
+                    "Hello everyone! Have you heard about Clonage? It's this
+                    cool app that lets you create unlimited videos from just one
+                    sample of yourself!
+                  </p>
+                  <p>
+                    And that’s not all; it supports various languages! Imagine
+                    the possibilities – reaching out and connecting, no matter
+                    the language.
+                  </p>
+                  <p>
+                    Since you're here at Buildspace, you know it’s the spot
+                    where ideas turn into reality. Whether it’s apps, YouTube
+                    channels, games, art, AI, or music, there’s space for every
+                    idea!
+                  </p>
+                  <p>
+                    So, why not explore Clonage while you’re working on projects
+                    in Buildspace? It could be a fun way to see your ideas come
+                    to life!"
+                  </p>
+                </div>
                 <AudioRecorder
                   onRecordingComplete={handleAudioRecorded}
                   audioTrackConstraints={{
