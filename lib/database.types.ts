@@ -100,6 +100,7 @@ export interface Database {
           input_video: string | null
           output_audio: string | null
           output_video: string | null
+          output_video_id: string | null
           status: string | null
           user: string | null
           voice: string | null
@@ -111,6 +112,7 @@ export interface Database {
           input_video?: string | null
           output_audio?: string | null
           output_video?: string | null
+          output_video_id?: string | null
           status?: string | null
           user?: string | null
           voice?: string | null
@@ -122,6 +124,7 @@ export interface Database {
           input_video?: string | null
           output_audio?: string | null
           output_video?: string | null
+          output_video_id?: string | null
           status?: string | null
           user?: string | null
           voice?: string | null
@@ -320,6 +323,7 @@ export interface Database {
           created_at: string
           description: string | null
           id: string
+          input_file: string | null
           name: string | null
           status: string | null
           user: string | null
@@ -328,6 +332,7 @@ export interface Database {
           created_at?: string
           description?: string | null
           id: string
+          input_file?: string | null
           name?: string | null
           status?: string | null
           user?: string | null
@@ -336,6 +341,7 @@ export interface Database {
           created_at?: string
           description?: string | null
           id?: string
+          input_file?: string | null
           name?: string | null
           status?: string | null
           user?: string | null
