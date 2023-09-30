@@ -15,11 +15,15 @@ export async function POST(
       data: { user }
     } = await supabase.auth.getUser();
 
+    if (!user || !user.id) {
+      throw new Error('User or user ID is undefined');
+    }
+
     const { data: creditData, error: creditError } = await supabase
       .from('credits')
       .select('*')
-      .eq('id', user?.id);
-
+      .eq('id', user.id);
+      
     if (creditError) {
       throw new Error(creditError.message);
     }

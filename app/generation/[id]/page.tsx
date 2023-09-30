@@ -62,12 +62,12 @@ export default function Generation({ params }: { params: { id: string } }) {
         .from('voices')
         .select('id')
         .eq('user', user.id)
-        .single();
+        .neq('status', 'deleted');
       if (error) throw error;
-      if (data) {
-        setVoice(data.id);
+      if (data.length > 0) {
+        setVoice(data[0].id);
       }
-      return data;
+      return data[0];
     } catch (error) {
       setErrorMessage(JSON.stringify(error));
       console.error('Error in fetchVoice: ', error);

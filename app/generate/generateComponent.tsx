@@ -8,12 +8,14 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import { UpdateIcon } from '@radix-ui/react-icons';
 
 type Generation = Database['public']['Tables']['generations']['Row'];
 
 export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
   const [generations, setGenerations] = useState<Generation[]>([]);
   const [creditsRemaining, setCreditsRemaining] = useState<number>(0);
+  const [loading, setLoading] = useState(false);
 
   const fetchCreditsRemaining = async () => {
     try {
@@ -76,6 +78,7 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
   };
 
   const fetchVoice = async () => {
+    setLoading(true);
     try {
       const supabase = createClientComponentClient();
       const {
@@ -90,15 +93,21 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
         .from('voices')
         .select('id')
         .eq('user', user.id)
-        .single();
+        .neq('status', 'deleted');
+
       if (error) throw error;
-      if (data) {
-        setVoice(data.id);
+      if (data.length > 0) {
+        console.log(JSON.stringify(data))
+        setVoice(data[0].id);
+      } else {
+        setVoice('');
       }
       return data;
     } catch (error) {
       console.error('Error in fetchVoice: ', error);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -132,45 +141,54 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
     <div className="max-w-6xl px-4 py-8 mx-auto sm:py-24 sm:px-6 lg:px-8">
       <div className="flex flex-col items-center space-y-12">
         <h1 className="text-white text-2xl font-bold">generate videos</h1>
-        {!voice ? (
-          <div className="flex flex-col items-center space-y-4 text-white">
-            <p>you don't have a voice yet</p>
-            <Link href="/setup">
-              <Button className="text-white">setup</Button>
-            </Link>
-          </div>
+        {loading ? (
+          <UpdateIcon className="animate-spin ml-1" />
         ) : (
           <>
-            {hasPaid ? (
-              <div className="text-center flex flex-col space-y-4 items-center">
-                <p>thanks for subscribing!</p>
-                <p>
-                  during beta, paying users get unlimited credits (but please be
-                  mindfull with the usage though 🙏)
-                </p>
-                <NewGenerationButton />
-              </div>
-            ) : creditsRemaining > 0 ? (
-              <div className="text-center flex flex-col space-y-4 items-center">
-                <p className="text-white text-center">
-                  You have {creditsRemaining} free credits remaining
-                  <Link
-                    className="text-orange-500 hover:text-orange-400"
-                    href="/pricing"
-                  >
-                    {' '}
-                    subscribe for unlimited access during the beta
-                  </Link>
-                </p>
-                <NewGenerationButton />
-              </div>
-            ) : (
+            {' '}
+            {!voice ? (
               <div className="flex flex-col items-center space-y-4 text-white">
-                <p>you don't have any credits remaining</p>
-                <Link href="/pricing">
-                  <Button variant="outline" className="text-white">subscribe</Button>
+                <p>you don't have a voice yet</p>
+                <Link href="/setup">
+                  <Button className="text-white">setup</Button>
                 </Link>
               </div>
+            ) : (
+              <>
+                {hasPaid ? (
+                  <div className="text-center flex flex-col space-y-4 items-center">
+                    <p>thanks for subscribing!</p>
+                    <p>
+                      during beta, paying users get unlimited credits (but
+                      please be mindfull with the usage though 🙏)
+                    </p>
+                    <NewGenerationButton />
+                  </div>
+                ) : creditsRemaining > 0 ? (
+                  <div className="text-center flex flex-col space-y-4 items-center">
+                    <p className="text-white text-center">
+                      You have {creditsRemaining} free credits remaining
+                      <Link
+                        className="text-orange-500 hover:text-orange-400"
+                        href="/pricing"
+                      >
+                        {' '}
+                        subscribe for unlimited access during the beta
+                      </Link>
+                    </p>
+                    <NewGenerationButton />
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center space-y-4 text-white">
+                    <p>you don't have any credits remaining</p>
+                    <Link href="/pricing">
+                      <Button variant="outline" className="text-white">
+                        subscribe
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+              </>
             )}
           </>
         )}

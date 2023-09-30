@@ -19,6 +19,7 @@ import { AudioRecorder } from 'react-audio-voice-recorder';
 
 export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
   const [loading, setLoading] = useState(false);
+  const [voiceLoading, setVoiceLoading] = useState(false)
   const [output, setOutput] = useState<any>(null);
   const [voice, setVoice] = useState<string>(''); // Renamed state variable
   const [audioFile, setAudioFile] = useState<File>();
@@ -29,7 +30,7 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
   const fetchVoice = async () => {
-    setLoading(true);
+    setVoiceLoading(true)
     try {
       const supabase = createClientComponentClient();
       const {
@@ -37,6 +38,7 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
       } = await supabase.auth.getUser();
 
       if (!user?.id) {
+        router.push('/signin');
         throw new Error('User not found');
       }
 
@@ -53,13 +55,13 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
       } else {
         setVoice('');
       }
-      return data;
+      return data[0];
     } catch (error: any) {
       console.error('Error in fetchVoice: ', error);
       setErrorMessage(error.message);
       throw error;
     } finally {
-      setLoading(false);
+      setVoiceLoading(false)
     }
   };
 
@@ -153,10 +155,10 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
     <div className="max-w-6xl px-4 py-8 mx-auto sm:py-24 sm:px-6 lg:px-8">
       <div className="flex flex-col items-center space-y-12">
         <h1 className="text-white text-2xl font-bold">voice cloning</h1>
-        {loading ? (
+        {voiceLoading ? (
           <div>
             {' '}
-            <UpdateIcon className="animate-spin ml-1" />
+            <UpdateIcon className="animate-spin" />
           </div> // Replace this with your loading UI
         ) : (
           <>
