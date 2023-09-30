@@ -8,8 +8,24 @@ if (!process.env.ELEVENLABS_API_TOKEN) {
   );
 }
 
+
 export async function POST(req: Request) {
   if (req.method === 'POST') {
+    const uploadFileToStorage = async (
+      bucket: string,
+      path: string,
+      file: File | Blob,
+      contentType: string
+    ): Promise<string> => {
+      try {
+        await supabase.storage.from(bucket).upload(path, file, { contentType });
+        const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+        return data?.publicUrl;
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    };
     console.log('clone voice route');
     const supabase = createRouteHandlerClient<Database>({ cookies });
     const {
@@ -28,6 +44,19 @@ export async function POST(req: Request) {
       return new Response('Missing required fields', { status: 400 });
     }
     console.log(voiceName, voiceDescription, audioFile.name);
+
+    const audioUrl = await uploadFileToStorage(
+      'public',
+      `audio/${audioFile.name}`,
+      audioFile,
+      audioFile.type
+    );
+    console.log('audioUrl', audioUrl);
+
+    if (!audioUrl) {
+      return new Response('Error uploading audio file', { status: 400 });
+    }
+
 
     const data = new FormData();
     data.append('name', voiceName);
@@ -58,7 +87,8 @@ export async function POST(req: Request) {
           id: voice_id,
           name: voiceName,
           description: voiceDescription || '',
-          user: user?.id
+          user: user?.id,
+          input_file: audioUrl,
         }
       ]);
 
