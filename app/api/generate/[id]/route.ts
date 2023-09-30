@@ -23,7 +23,7 @@ export async function POST(
       .from('credits')
       .select('*')
       .eq('id', user.id);
-      
+
     if (creditError) {
       throw new Error(creditError.message);
     }
@@ -83,7 +83,8 @@ export async function POST(
       const { data, error } = await supabase
         .from('voices')
         .select('id')
-        .eq('user', user?.id);
+        .eq('user', user?.id)
+        .neq('status', 'deleted');
 
       if (error) {
         throw new Error(error.message);

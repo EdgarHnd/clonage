@@ -1,4 +1,5 @@
 import { Database } from '@/lib/database.types';
+import { randomString } from '@/lib/utils';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 
@@ -47,7 +48,7 @@ export async function POST(req: Request) {
 
     const audioUrl = await uploadFileToStorage(
       'public',
-      `audio/${audioFile.name}`,
+      `audio/${randomString(10)}${audioFile.name}`,
       audioFile,
       audioFile.type
     );
