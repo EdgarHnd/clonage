@@ -6,6 +6,8 @@ import SignOutButton from './SignOutButton';
 
 import s from './Navbar.module.css';
 import CollapsibleMenu from './CollapsibleMenu';
+import { Button } from '../button';
+import { Badge } from '../badge';
 
 export default async function Navbar() {
   const supabase = createServerSupabaseClient();
@@ -22,27 +24,33 @@ export default async function Navbar() {
         <div className="relative flex flex-row justify-between py-4 align-center md:py-6">
           <div className="flex items-center">
             <Link
-              href="/"
+              href="https://www.clonage.app"
+              target='_blank'
               className="flex flex-row items-center"
               aria-label="Logo"
             >
               <Logo />
               <p className="text-2xl font-bold text-white ml-3">clonage</p>
-              <p className="relative -top-3 -left-2 text-xs text-red-500">beta</p>
+              <p className="relative -top-3 -left-2 text-xs text-red-500">
+                beta
+              </p>
             </Link>
-            <nav className="hidden ml-6 space-x-2 md:block">
+            <nav className="hidden ml-6 space-x-2 md:flex">
               {user ? (
                 <>
-                  <Link href="/setup" className={s.link}>
-                    setup
-                  </Link>
-                  <Link href="/generate" className={s.link}>
+                  <Link href="/generate">
                     generate
                   </Link>
+                  <div className='flex flex-row items-center'>
+                    <p className="text-gray-500">one-click translate</p>
+                    <p className="relative -top-3 -left-2 text-xs text-red-500">
+                      coming soon
+                    </p>
+                  </div>
                 </>
               ) : (
                 <>
-                 {/*  <Link href="/" className={s.link}>
+                  {/*  <Link href="/" className={s.link}>
                     roadmap
                   </Link> */}
                   <Link href="/pricing" className={s.link}>

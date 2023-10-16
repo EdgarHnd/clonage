@@ -5,16 +5,6 @@ import { cookies } from 'next/headers';
 import { Database } from '@/lib/database.types';
 import { randomString } from '@/lib/utils';
 
-export const dynamic = 'force-dynamic';
-//exit if no API token
-if (!process.env.ELEVENLABS_API_TOKEN) {
-  throw new Error('No API token found');
-}
-
-if (!process.env.SYNCHRONIZER_API_TOKEN) {
-  throw new Error('No API token found');
-}
-
 export async function POST(
   req: Request,
   { params }: { params: { id: string } }
@@ -25,8 +15,8 @@ export async function POST(
       data: { user }
     } = await supabase.auth.getUser();
 
-    if (!user || !user.id) {
-      throw new Error('User or user ID is undefined');
+    if (!user) {
+      throw new Error('User not found');
     }
 
     const { data: creditData, error: creditError } = await supabase
@@ -70,8 +60,8 @@ export async function POST(
       throw new Error('No voice provided');
     }
 
-    /*     const videoResponse = await fetch(generation.input_video);
-    const video: Blob = await videoResponse.blob(); */
+    const videoResponse = await fetch(generation.input_video);
+    const video: Blob = await videoResponse.blob();
 
     const uploadFileToStorage = async (
       bucket: string,
@@ -93,8 +83,7 @@ export async function POST(
       const { data, error } = await supabase
         .from('voices')
         .select('id')
-        .eq('user', user?.id)
-        .neq('status', 'deleted');
+        .eq('user', user?.id);
 
       if (error) {
         throw new Error(error.message);
@@ -149,27 +138,56 @@ export async function POST(
         .eq('id', params.id);
 
       console.log('audioUrl' + audioUrl);
-      const output = await fetch('https://api.synclabs.so/video', {
-        method: 'POST',
-        headers: {
-          accept: 'application/json',
-          'x-api-key': process.env.SYNCHRONIZER_API_TOKEN as string,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          audioUrl: audioUrl,
-          videoUrl: generation.input_video,
-          synergize: true
-        })
-      });
+      const audioResponse = await fetch(audioUrl);
+      const audio: Blob = await audioResponse.blob();
 
-      const responseBody = await output.json();
-      console.log('output', JSON.stringify(responseBody));
-      const finalVideoId = responseBody.id;
+      const videoBytes = await video.arrayBuffer();
+      const audioBytes = await audio.arrayBuffer();
+
+      const videoBuffer = Buffer.from(videoBytes);
+      const audioBuffer = Buffer.from(audioBytes);
+
+      // Convert to base64
+      const videoBase64 = `data:video/mp4;base64,${videoBuffer.toString(
+        'base64'
+      )}`;
+      const audioBase64 = `data:audio/mp3;base64,${audioBuffer.toString(
+        'base64'
+      )}`;
+
+      // Run the model
+      if (!videoBase64 || !audioBase64) {
+        throw new Error('No video or audio file provided');
+      }
+      const output: any = await replicate.run(
+        'devxpy/cog-wav2lip:8d65e3f4f4298520e079198b493c25adfc43c058ffec924f2aefc8010ed25eef',
+        {
+          input: {
+            face: videoBase64,
+            audio: audioBase64
+          }
+        }
+      );
+      console.log('output' + output);
+      // Fetch the video from the URL
+      const resultUrl: string = output;
+      const res = await fetch(resultUrl);
+      const blob = await res.blob();
+      // Upload the video to Supabase Storage
+      const videoPath = `generations/${params.id}/${
+        'output_video' + randomString(10) + '.mp4'
+      }`;
+      const finalVideoUrl = await uploadFileToStorage(
+        'public',
+        videoPath,
+        blob,
+        'video/mp4'
+      );
+      console.log(finalVideoUrl);
       // Update the generation item
       await supabase
         .from('generations')
-        .update({ output_video_id: finalVideoId, status: 'processing' })
+        .update({ output_video: finalVideoUrl, status: 'completed' })
         .eq('id', params.id);
 
       // Update the credits item
@@ -193,7 +211,7 @@ export async function POST(
           .eq('id', user?.id);
       }
 
-      return new Response(JSON.stringify(finalVideoId), {
+      return new Response(JSON.stringify({ output: finalVideoUrl }), {
         status: 200
       });
     } catch (err: any) {

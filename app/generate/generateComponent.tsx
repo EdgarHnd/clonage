@@ -97,7 +97,7 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
 
       if (error) throw error;
       if (data.length > 0) {
-        console.log(JSON.stringify(data))
+        console.log(JSON.stringify(data));
         setVoice(data[0].id);
       } else {
         setVoice('');
@@ -162,7 +162,12 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
                       during beta, paying users get unlimited credits (but
                       please be mindfull with the usage though 🙏)
                     </p>
-                    <NewGenerationButton />
+                    <div className="flex flex-row items-center space-x-4 text-white">
+                      <Link href="/setup">
+                        <Button className="text-white">change voice</Button>
+                      </Link>
+                      <NewGenerationButton />
+                    </div>
                   </div>
                 ) : creditsRemaining > 0 ? (
                   <div className="text-center flex flex-col space-y-4 items-center">
@@ -176,7 +181,12 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
                         subscribe for unlimited access during the beta
                       </Link>
                     </p>
-                    <NewGenerationButton />
+                    <div className="flex flex-row items-center space-x-4 text-white">
+                      <Link href="/setup">
+                        <Button className="text-white">change voice</Button>
+                      </Link>
+                      <NewGenerationButton />
+                    </div>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center space-y-4 text-white">

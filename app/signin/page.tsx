@@ -6,7 +6,6 @@ import Logo from '@/components/icons/Logo';
 
 export default async function SignIn() {
   const session = await getSession();
-  console.log('session', session);
 
   if (session) {
     return redirect('/generate');

@@ -1,73 +1,109 @@
-// components/ui/InputFile/inputfile.tsx
-import { useRef, useState } from 'react';
+// app/generate/inputs/inputAudio.tsx
+import { useCallback, useRef, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { UploadIcon } from '@radix-ui/react-icons';
+import { useDropzone } from 'react-dropzone';
+import { useToast } from '@/components/ui/use-toast';
+import { Button } from '@/components/ui/button';
 
 interface InputAudioProps {
   onFileChange: (file: File | null) => void;
+  setErrorMessage: (message: string) => void;
   label?: string;
-  setErrorMessage?: (message: string) => void;
+  existingUrl?: string;
+  disabled?: boolean;
 }
 
 export function InputAudio({
   onFileChange,
+  setErrorMessage,
   label,
-  setErrorMessage
+  existingUrl,
+  disabled
 }: InputAudioProps) {
-  const inputFileRef = useRef<HTMLInputElement>(null);
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      const maxSize = 11 * 1024 * 1024; // 11MB in bytes
+  if (existingUrl && !fileUrl) {
+    setFileUrl(existingUrl);
+  }
 
-      if (file.size > maxSize) {
-        if (setErrorMessage) {
-          setErrorMessage('File size exceeds the maximum limit of 11MB');
-        } else {
-          alert('File size exceeds the maximum limit of 11MB');
-        }
-        if (inputFileRef.current) {
-          inputFileRef.current.value = ''; // reset the input field
-        }
-        onFileChange(null);
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      if (acceptedFiles.length > 1) {
+        toast({
+          title: 'too many files',
+          description:
+            'you can only upload one audio file at a time, please try again',
+          duration: 5000
+        });
         return;
-      } else {
-        onFileChange(file); // pass the file to the parent component
       }
-    } else {
-      onFileChange(null); // pass null if no file is selected
-    }
-  };
 
-  const handleClick = () => {
-    if (inputFileRef.current) {
-      inputFileRef.current.click();
+      const file = acceptedFiles[0];
+      console.log('file' + file);
+
+      // check that the audio file does not exceed 11MB
+      if (file.size > 11 * 1024 * 1024) {
+        toast({
+          title: 'audio exceeds size limit',
+          description: 'the size of the audio cannot exceed 11MB',
+          duration: 5000
+        });
+        return;
+      }
+
+      setFileUrl(URL.createObjectURL(file));
+      onFileChange(file); // pass the file to the parent component
+
+      toast({
+        title: 'audio selected',
+        description: 'the audio was successfully selected',
+        duration: 5000
+      });
+    },
+    [onFileChange]
+  );
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      'audio/*': ['.mp3', '.wav', '.m4a', '.flac', '.mpeg4', '.mp4', '.mpeg3']
     }
-  };
+  });
 
   return (
     <div className="grid w-full space-y-4 max-w-sm items-center justify-center gap-1.5 text-white">
       <div
-        onClick={handleClick}
-        className="border-dashed border-2 border-gray-400 py-6 px-4 rounded-md text-center cursor-pointer hover:border-white transition-colors duration-200"
+        {...getRootProps()}
+        className="outline-dashed outline-2 outline-gray-100 hover:outline-yellow-400 w-full h-full rounded-md p-4 flex justify-center align-middle"
       >
-        <UploadIcon className="mx-auto mb-2 text-gray-400" />
-        <Input
-          ref={inputFileRef}
-          id="audioInput"
-          type="file"
-          accept="audio/*,video/*"
-          onChange={handleChange}
-          className="hidden" // hide the default input
-        />
-        <Label htmlFor="audioInput" className="text-gray-400 cursor-pointer">
-          {inputFileRef.current && inputFileRef.current.files?.length
-            ? inputFileRef.current.files[0].name
-            : 'click to upload your sample'}
-        </Label>
+        <input {...getInputProps()} />
+        {isDragActive ? (
+          <p className="self-center">drop the files here ...</p>
+        ) : (
+          <div className="flex justify-center flex-col items-center gap-2">
+            <UploadIcon className="mx-auto mb-2 text-gray-400" />
+            <p className="text-center">
+              drop your audio here, or click to select file
+            </p>
+          </div>
+        )}
       </div>
+      {fileUrl && (
+        <div className="flex flex-col items-center space-y-4">
+          <audio className="rounded" src={fileUrl} controls />
+          <Button
+            variant="outline"
+            size={'sm'}
+            className="w-full"
+            onClick={() => setFileUrl(null)}
+          >
+            remove
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

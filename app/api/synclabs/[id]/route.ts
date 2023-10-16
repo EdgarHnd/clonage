@@ -3,6 +3,12 @@ import { cookies } from 'next/headers';
 import { Database } from '@/lib/database.types';
 import { randomString } from '@/lib/utils';
 
+export const dynamic = 'force-dynamic'
+
+if (!process.env.SYNCHRONIZER_API_TOKEN) {
+  throw new Error('No API token found');
+}
+
 export async function POST(req: Request) {
   if (req.method === 'POST') {
     const supabase = createRouteHandlerClient<Database>({ cookies });
@@ -54,19 +60,17 @@ export async function POST(req: Request) {
       console.log('videoUrl', videoUrl);
       console.log('audioUrl', audioUrl);
 
-      const response = await fetch(
-        'https://rogue-yogi--wav2lip-2-v0-1-02-generate-sync.modal.run',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            audio_uri: audioUrl,
-            video_uri: videoUrl
-          })
-        }
-      );
+      const response = await fetch('https://api.synclabs.so/video', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          audio_uri: audioUrl,
+          video_uri: videoUrl,
+          synergize: true
+        })
+      });
 
       const output = await response.json();
       console.log('output', JSON.stringify(output));
@@ -81,21 +85,36 @@ export async function POST(req: Request) {
   }
 }
 
-/* async function uploadFileToStorage(
-  bucket: string,
-  path: string,
-  file: File,
-  contentType: string
-): Promise<string> {
-  try {
-    await supabase.storage.from(bucket).upload(path, file, { contentType });
+export async function GET(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
+  if (req.method === 'GET') {
+    if (!params.id) {
+      throw new Error('No id provided');
+    }
+    try {
+      const response = await fetch(
+        `https://api.synclabs.so/video/${params.id}`,
+        {
+          method: 'GET',
+          headers: {
+            accept: 'application/json',
+            'x-api-key': process.env.SYNCHRONIZER_API_TOKEN as string,
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache'
+          }
+        }
+      );
+      const output = await response.json();
+      console.log('output', JSON.stringify(output.status));
 
-    // Get the URL of the uploaded file
-    const { data } = await supabase.storage.from(bucket).getPublicUrl(path);
-
-    return data?.publicUrl;
-  } catch (error) {
-    console.error(error);
-    throw error;
+      return new Response(JSON.stringify({ output }));
+    } catch (err: any) {
+      console.log(err);
+      return new Response(`Server Error: ${err.message}`, { status: 400 });
+    }
+  } else {
+    return new Response('Method Not Allowed', { status: 405 });
   }
-} */
+}

@@ -1,6 +1,7 @@
 import SupabaseProvider from './supabase-provider';
 import Footer from '@/components/ui/Footer';
 import Navbar from '@/components/ui/Navbar';
+import { Toaster } from "@/components/ui/toaster";
 import { PropsWithChildren } from 'react';
 import 'styles/main.css';
 import { Analytics } from '@vercel/analytics/react';
@@ -49,7 +50,6 @@ export default function RootLayout({
     <html lang="en">
       <body className="bg-black loading text-white">
         <SupabaseProvider>
-          {/* @ts-expect-error */}
           <Navbar />
           <main
             id="skip"
@@ -59,6 +59,7 @@ export default function RootLayout({
             <Analytics />
           </main>
           <Footer />
+          <Toaster />
         </SupabaseProvider>
       </body>
     </html>

@@ -41,6 +41,11 @@ export default async function Account() {
     const supabase = createServerActionClient<Database>({ cookies });
     const session = await getSession();
     const user = session?.user;
+
+    if (!user?.id) {
+      throw new Error('User not found');
+    }
+
     const { error } = await supabase
       .from('users')
       .update({ full_name: newName })
@@ -89,7 +94,11 @@ export default async function Account() {
             {subscription ? (
               `${subscriptionPrice}/${subscription?.prices?.interval}`
             ) : (
-              <Link href="/pricing"><Button size="lg" variant="secondary">choose your plan</Button></Link>
+              <Link href="/pricing">
+                <Button size="lg" variant="secondary">
+                  choose your plan
+                </Button>
+              </Link>
             )}
           </div>
         </Card>
@@ -100,7 +109,7 @@ export default async function Account() {
             <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center">
               <p className="pb-4 sm:pb-0">64 characters maximum</p>
               <Button
-                /* variant="slim" */
+                variant="secondary"
                 type="submit"
                 form="nameForm"
                 disabled={false}
@@ -133,13 +142,13 @@ export default async function Account() {
                 we will email you to verify the change.
               </p>
               <Button
-                /* variant="slim" */
+                variant="secondary"
                 type="submit"
                 form="emailForm"
                 disabled={true}
               >
                 {/* WARNING - In Next.js 13.4.x server actions are in alpha and should not be used in production code! */}
-                Update Email
+                update Email
               </Button>
             </div>
           }

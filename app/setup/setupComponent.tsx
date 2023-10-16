@@ -16,10 +16,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { UpdateIcon } from '@radix-ui/react-icons';
 import { AudioRecorder } from 'react-audio-voice-recorder';
+import { Switch } from '@/components/ui/switch';
+import { randomString } from '@/lib/utils';
 
 export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
   const [loading, setLoading] = useState(false);
-  const [voiceLoading, setVoiceLoading] = useState(false)
+  const [voiceLoading, setVoiceLoading] = useState(false);
   const [output, setOutput] = useState<any>(null);
   const [voice, setVoice] = useState<string>(''); // Renamed state variable
   const [audioFile, setAudioFile] = useState<File>();
@@ -28,9 +30,10 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [isTextVisible, setIsTextVisible] = useState(false);
 
   const fetchVoice = async () => {
-    setVoiceLoading(true)
+    setVoiceLoading(true);
     try {
       const supabase = createClientComponentClient();
       const {
@@ -61,7 +64,7 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
       setErrorMessage(error.message);
       throw error;
     } finally {
-      setVoiceLoading(false)
+      setVoiceLoading(false);
     }
   };
 
@@ -82,15 +85,15 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
       setErrorMessage('Audio file is missing. Please upload an audio file.');
       return;
     }
-    if (!voiceName) {
+/*     if (!voiceName) {
       setErrorMessage('Voice name is missing. Please enter a voice name.');
       return;
-    }
+    } */
     try {
       setLoading(true);
       const data = new FormData();
       data.set('audioFile', audioFile);
-      data.set('voiceName', voiceName);
+      data.set('voiceName', randomString(8));
       data.set('voiceDescription', voiceDescription);
       const response = await fetch('/api/clone-voice', {
         method: 'POST',
@@ -213,33 +216,41 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
             ) : (
               <>
                 <div className="flex flex-col md:flex-row md:space-x-6 w-full items-start justify-center">
-                  <div className="md:w-1/2 w-full flex flex-col space-y-4 items-center text-center">
-                    <p className="text-sm text-gray-600 md:w-1/2">
-                      record a voice sample (30s)
+                  <div className="md:w-1/2 w-full flex flex-col space-y-8 items-center text-center">
+                   {/*  <p className="md:w-1/2">
+                      record or upload a voice sample (30s)
                     </p>
-                    <div className="">
-                      <p>
-                        "Hello everyone! Have you heard about Clonage? It's this
-                        cool app that lets you create unlimited videos from just
-                        one sample of yourself!
+                    <div className="flex flex-row items-center w-full justify-center space-x-2">
+                      <p className="text-sm text-gray-600 md:w-1/2">
+                        show script example
                       </p>
-                      <p>
-                        And that’s not all; it supports various languages!
-                        Imagine the possibilities – reaching out and connecting,
-                        no matter the language.
-                      </p>
-                      <p>
-                        Since you're here at Buildspace, you know it’s the spot
-                        where ideas turn into reality. Whether it’s apps,
-                        YouTube channels, games, art, AI, or music, there’s
-                        space for every idea!
-                      </p>
-                      <p>
-                        So, why not explore Clonage while you’re working on
-                        projects in Buildspace? It could be a fun way to see
-                        your ideas come to life!"
-                      </p>
+                      <Switch
+                        checked={isTextVisible}
+                        onCheckedChange={setIsTextVisible}
+                      />
                     </div>
+                    {isTextVisible && (
+                      <div className="text-sm text-start">
+                        <p>
+                          Hello everyone! <br /> Have you heard about Clonage?{' '}
+                          <br /> It's this cool app that lets you create
+                          unlimited videos from just one sample of yourself!
+                          <br />
+                          And that’s not all; it supports various languages!
+                          Imagine the possibilities – reaching out and
+                          connecting, no matter the language.
+                          <br />
+                          Do you know about Buildspace? <br />
+                          It’s the spot where ideas turn into reality. Whether
+                          it’s apps, YouTube channels, games, art, AI, or music,
+                          there’s space for every idea!
+                          <br />
+                          So, why not explore Clonage and give your feedback
+                          about the experience? <br /> I'd love to hear from
+                          you!
+                        </p>
+                      </div>
+                    )}
                     <AudioRecorder
                       onRecordingComplete={handleAudioRecorded}
                       audioTrackConstraints={{
@@ -248,9 +259,9 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
                       }}
                       showVisualizer={true}
                       downloadFileExtension="webm"
-                    />
-                    <p className="text-sm text-gray-600 md:w-1/2">
-                      or upload an audio or video of yourself talking clearly
+                    /> */}
+                    <p className="text-sm text-gray-600 md:w-3/4 text-start">
+                      upload an audio or video of yourself talking clearly
                       without background noise (max size 11MB)
                     </p>
                     <InputAudio
@@ -258,9 +269,8 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
                       label="original voice"
                       onFileChange={handleAudioFileChange}
                     />
-                    {audioUrl && <audio src={audioUrl} controls />}
                   </div>
-                  <div className="w-full md:w-1/2 text-white flex flex-col space-y-4 md:mt-0 mt-4">
+                  {/* <div className="w-full md:w-1/2 text-white flex flex-col space-y-4 md:mt-0 mt-4">
                     <Label htmlFor="voiceName">voice name</Label>
                     <Input
                       id="voiceName"
@@ -269,17 +279,17 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
                       className=" w-full h-full p-4"
                       placeholder="enter voice name."
                     />
-                    {/* <Label htmlFor="voiceDescription">voice description</Label>
-                <Textarea
-                  id="voiceDescription"
-                  value={voiceDescription}
-                  onChange={(e) => setVoiceDescription(e.target.value)}
-                  className=" w-full h-full p-4"
-                  placeholder="enter voice description."
-                /> */}
-                  </div>
+                    <Label htmlFor="voiceDescription">voice description</Label>
+                    <Textarea
+                      id="voiceDescription"
+                      value={voiceDescription}
+                      onChange={(e) => setVoiceDescription(e.target.value)}
+                      className=" w-full h-full p-4"
+                      placeholder="enter voice description."
+                    />
+                  </div> */}
                 </div>
-                <Button className="mt-12" onClick={handleClick}>
+                <Button variant="secondary" className="mt-8" onClick={handleClick}>
                   {loading ? (
                     <>
                       cloning voice <UpdateIcon className="animate-spin ml-1" />

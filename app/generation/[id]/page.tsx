@@ -19,32 +19,44 @@ import {
 import { Badge } from '@/components/ui/badge';
 import NewGenerationButton from '@/app/generate/newGenerationButton';
 import Link from 'next/link';
+import { Database } from '@/lib/database.types';
+
+type Generation = Database['public']['Tables']['generations']['Row'];
 
 export default function Generation({ params }: { params: { id: string } }) {
   const [loading, setLoading] = useState(false);
   const [output, setOutput] = useState<any>(null);
+  const [finalOutputStatus, setFinalOutputStatus] = useState<string | null>(
+    'created'
+  );
+  const [finalVideoId, setFinalVideoId] = useState<string | null>('');
   const [videoFile, setVideoFile] = useState<File | null>();
-  const [script, setScript] = useState<string>('');
-  const [voice, setVoice] = useState<string>('');
+  const [script, setScript] = useState<string | null>('');
+  const [voice, setVoice] = useState<string | null>('');
   const supabase = createClientComponentClient();
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string>('');
 
-  const { data, error } = useSWR(`/api/generation/${params.id}`, async () => {
-    const { data, error } = await supabase
-      .from('generations')
-      .select('*')
-      .eq('id', params.id)
-      .single();
-    if (error) throw error;
-    return data;
-  });
+  const { data, error } = useSWR<Generation>(
+    `/api/generation/${params.id}`,
+    async () => {
+      const { data, error } = await supabase
+        .from('generations')
+        .select('*')
+        .eq('id', params.id)
+        .single();
+      if (error) throw error;
+      return data;
+    }
+  );
 
   useEffect(() => {
     if (!data) return;
     setVoice(data.voice);
     setScript(data.input_text);
     setOutput(data.output_video);
+    setFinalVideoId(data.output_video_id);
+    setFinalOutputStatus(data.status);
   }, [data]);
 
   const fetchVoice = async () => {
@@ -82,6 +94,105 @@ export default function Generation({ params }: { params: { id: string } }) {
   const handleVideoFileChange = (newFile: File | null) => {
     setVideoFile(newFile);
   };
+
+  useEffect(() => {
+    let tempOutput: any = null;
+    let tempOutputStatus = '';
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    const poll = async () => {
+      if (!finalVideoId || finalOutputStatus != 'processing') return;
+      do {
+        console.log('polling');
+        const response = await fetch(`/api/synclabs/${finalVideoId}`, {
+          method: 'GET',
+          headers: {
+            'Cache-Control': 'no-cache'
+          },
+          signal
+        });
+
+        if (signal.aborted) {
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const responseOutput = await response.json();
+        console.log('output', JSON.stringify(responseOutput));
+        console.log('output status', responseOutput.output.status);
+        console.log('output url', responseOutput.output.url);
+
+        if (responseOutput.output.status === 'FAILED') {
+          //set generation status to failed
+          const { error: updateError } = await supabase
+            .from('generations')
+            .update({
+              status: 'failed'
+            })
+            .eq('id', params.id);
+        }
+
+        tempOutputStatus = responseOutput.output.status;
+        tempOutput = responseOutput; // update the outer output variable
+
+        if (tempOutputStatus !== 'COMPLETED') {
+          await new Promise((resolve) => setTimeout(resolve, 5000));
+        } else if (tempOutputStatus === 'COMPLETED') {
+          try {
+            const path = `generations/${params.id}/${
+              'output_video' + randomString(10) + '.mp4'
+            }`;
+
+            const downloadResponse = await fetch('/api/download-video', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ videoUrl: tempOutput.output.url, path })
+            });
+
+            if (!downloadResponse.ok) {
+              const errorData = await downloadResponse.json();
+              throw new Error(
+                errorData.message ||
+                  'an error occurred during video downloading'
+              );
+            }
+
+            const urlData = await downloadResponse.json();
+            console.log('urlData', urlData);
+            setOutput(urlData.url);
+
+            const { error: updateError } = await supabase
+              .from('generations')
+              .update({
+                output_video: urlData.url,
+                status: 'completed'
+              })
+              .eq('id', params.id);
+
+            if (updateError) {
+              throw updateError;
+            }
+          } catch (error) {
+            console.log(error);
+          } finally {
+            mutate(`/api/generation/${params.id}`);
+          }
+        }
+      } while (tempOutputStatus === 'PROCESSING' && tempOutput != 'COMPLETED');
+    };
+
+    poll();
+
+    return () => {
+      controller.abort();
+    };
+  }, [finalVideoId, output, finalOutputStatus]);
 
   const runModel = async () => {
     setLoading(true);
@@ -139,7 +250,23 @@ export default function Generation({ params }: { params: { id: string } }) {
           errorData.message || 'an error occurred during video generation'
         );
       }
-      // After the model run is completed, refetch the data
+
+      // Get the generation id from the response
+      const finalId = await response.json();
+      console.log('response', finalId);
+      setFinalVideoId(finalId);
+
+      //update the generation item with the generation id
+      const { error: updateError2 } = await supabase
+        .from('generations')
+        .update({
+          output_video_id: finalId
+        })
+        .eq('id', params.id);
+
+      if (updateError2) {
+        throw updateError2;
+      }
     } catch (error: any) {
       setErrorMessage(error.message);
       console.log(error.message);
@@ -189,18 +316,17 @@ export default function Generation({ params }: { params: { id: string } }) {
               disabled={data?.status == 'completed'}
               label="reference video"
               onFileChange={handleVideoFileChange}
-              existingUrl={data?.input_video}
+              existingUrl={data?.input_video || ''}
             />
             <Badge className="text-sm text-gray-200">
               upload a horizontal video of you looking at the camera (max 10s)
-              ✨
             </Badge>
           </div>
-          <div className="flex flex-col items-start space-y-4 md:w-1/2 w-full text-white h-[300px]">
+          <div className="flex flex-col items-start space-y-4 md:w-1/2 md:mt-0 mt-4 w-full text-white h-[300px]">
             <Label htmlFor="script">script</Label>
             <Textarea
               maxLength={300}
-              disabled={data?.status == 'completed'}
+              disabled={data?.status != 'created'}
               id="script"
               value={script || ''}
               onChange={(e) => setScript(e.target.value)}
@@ -208,7 +334,7 @@ export default function Generation({ params }: { params: { id: string } }) {
               placeholder="type your video script here"
             />
             <Badge variant="secondary">
-              tips: try writing in another language 🔥
+              tips: try writing in another language 🇮🇳🇷🇺🇫🇷🇮🇹🇪🇸🇩🇪🏴󠁧󠁢󠁥󠁮󠁧󠁿🇨🇳🇯🇵🇦🇪🇸🇦🇺🇸
             </Badge>
           </div>
         </div>
@@ -228,26 +354,41 @@ export default function Generation({ params }: { params: { id: string } }) {
                 <ArrowLeftIcon />
               </Button>
             </Link>
-            {data?.status != 'completed' ? (
+            {data?.status === 'completed' || data?.status === 'failed' ? (
+              <div className="flex flex-row items-center space-x-2">
+                {data?.status === 'failed' && (
+                  <p className="text-red-800">failed</p>
+                )}
+                <NewGenerationButton />
+              </div>
+            ) : (
               <div className="flex flex-col items-center space-y-2">
-                <Button onClick={handleClick}>
+                <Button
+                  disabled={loading || finalOutputStatus != 'created'}
+                  variant="secondary"
+                  onClick={handleClick}
+                >
                   {loading ? (
                     <>
-                      generating <CommitIcon className="animate-spin ml-1" />
+                      creating (keep tab open){' '}
+                      <CommitIcon className="animate-spin ml-1" />
+                    </>
+                  ) : finalOutputStatus === 'processing' ? (
+                    <>
+                      processing (you can come back later){' '}
+                      <CommitIcon className="animate-spin ml-1" />
                     </>
                   ) : (
                     'generate'
                   )}
                 </Button>
               </div>
-            ) : (
-              <NewGenerationButton />
             )}
           </div>
           {data?.status != 'completed' && (
             <>
               <p className="text-sm text-gray-500">
-                generation takes arround 1 minute (if you don't see the outpout,{' '}
+                generation takes arround 1 minute (if you don't see the output,{' '}
                 <Link
                   href="https://x.com/edgarhnd"
                   className="hover:text-white"

@@ -1,8 +1,11 @@
 // components/ui/InputFile/inputfile.tsx
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { UploadIcon } from '@radix-ui/react-icons';
+import { FileIcon, UploadIcon } from '@radix-ui/react-icons';
+import { useDropzone } from 'react-dropzone';
+import { useToast } from '@/components/ui/use-toast';
+import { Button } from '@/components/ui/button';
 
 interface InputVideoProps {
   onFileChange: (file: File | null) => void;
@@ -17,52 +20,90 @@ export function InputVideo({
   existingUrl,
   disabled
 }: InputVideoProps) {
-  const inputFileRef = useRef<HTMLInputElement>(null);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const { toast } = useToast();
 
   if (existingUrl && !fileUrl) {
     setFileUrl(existingUrl);
   }
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      if (acceptedFiles.length > 1) {
+        toast({
+          title: 'too many files',
+          description:
+            'you can only upload one video at a time, please try again',
+          duration: 5000
+        });
+        return;
+      }
+
+      const file = acceptedFiles[0];
+
+      console.log('file' + file);
+
+      // check that the video file does not exceed 4.5MB
+      if (file.size > 11 * 1024 * 1024) {
+        toast({
+          title: 'video exceeds size limit',
+          description: 'the size of the video cannot exceed 11MB',
+          duration: 5000
+        });
+        return;
+      }
+
       setFileUrl(URL.createObjectURL(file));
       onFileChange(file); // pass the file to the parent component
-    } else {
-      onFileChange(null); // pass null if no file is selected
-    }
-  };
 
-  const handleClick = () => {
-    if (inputFileRef.current) {
-      inputFileRef.current.click();
+      toast({
+        title: 'video selected',
+        description: 'the video was successfully selected',
+        duration: 5000
+      });
+    },
+    [onFileChange]
+  );
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      'video/*': ['.mp4', '.m4v', '.mov', '.webm', '.mkv', '.avi', '.wmv']
     }
-  };
+  });
 
   return (
     <div className="grid w-full space-y-4 max-w-sm items-center justify-center gap-1.5 text-white">
       <div
-        onClick={handleClick}
-        className="border-dashed border-2 border-gray-400 py-6 px-4 rounded-md text-center cursor-pointer hover:border-white transition-colors duration-200"
+        {...getRootProps()}
+        className="outline-dashed outline-2 outline-gray-100 hover:outline-blue-500 w-full h-full rounded-md p-4 flex justify-center align-middle"
       >
-        <UploadIcon className="mx-auto mb-2 text-gray-400" />
-        <Input
-          disabled={disabled}
-          ref={inputFileRef}
-          id="videoInput"
-          type="file"
-          accept="video/*,image/*"
-          onChange={handleChange}
-          className="hidden" // hide the default input
-        />
-        <Label htmlFor="videoInput" className="text-gray-400 cursor-pointer">
-          {inputFileRef.current && inputFileRef.current.files?.length
-            ? inputFileRef.current.files[0].name
-            : 'click to upload your video'}
-        </Label>
+        <input {...getInputProps()} />
+        {isDragActive ? (
+          <p className="self-center">drop the files here ...</p>
+        ) : (
+          <div className="flex justify-center flex-col items-center gap-2">
+            <UploadIcon className="mx-auto mb-2 text-gray-400" />
+            <p className="text-center">
+              drop your video here, or click to select file
+            </p>
+          </div>
+        )}
       </div>
-      {fileUrl && <video className="rounded" src={fileUrl} controls />}
+      {fileUrl && (
+        <div>
+          {' '}
+          <video className="rounded" src={fileUrl} controls />
+          <Button
+            variant="outline"
+            size={'sm'}
+            className="w-full"
+            onClick={() => setFileUrl(null)}
+          >
+            remove
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
