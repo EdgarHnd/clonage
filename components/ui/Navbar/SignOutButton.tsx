@@ -4,21 +4,20 @@ import { useSupabase } from '@/app/supabase-provider';
 import { useRouter } from 'next/navigation';
 
 import s from './Navbar.module.css';
-import { Button } from '../button';
 
 export default function SignOutButton() {
   const router = useRouter();
   const { supabase } = useSupabase();
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    router.refresh()
+  }
   return (
-    <Button
-      variant="ghost"
-      onClick={async () => {
-        await supabase.auth.signOut();
-        router.push('/signin');
-        router.refresh();
-      }}
+    <button
+      className={s.link}
+      onClick={handleSignOut}
     >
       sign out
-    </Button>
+    </button>
   );
 }
