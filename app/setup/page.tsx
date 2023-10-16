@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { redirect } from 'next/navigation';
 import SetupComponent from './setupComponent';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Account() {
   const [session, subscription] = await Promise.all([getSession(), getSubscription()]);
 
