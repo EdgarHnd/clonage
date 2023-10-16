@@ -5,6 +5,7 @@ import { cookies } from 'next/headers';
 import { Database } from '@/lib/database.types';
 import { randomString } from '@/lib/utils';
 
+export const maxDuration = 300; 
 export const dynamic = 'force-dynamic';
 //exit if no API token
 if (!process.env.ELEVENLABS_API_TOKEN) {
