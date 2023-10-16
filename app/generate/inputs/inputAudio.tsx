@@ -70,14 +70,16 @@ export function InputAudio({
     onDrop,
     accept: {
       'audio/*': ['.mp3', '.wav', '.m4a', '.flac', '.mpeg4', '.mp4', '.mpeg3']
-    }
+    },
+    maxFiles: 1,
+    disabled: disabled
   });
 
   return (
     <div className="grid w-full space-y-4 max-w-sm items-center justify-center gap-1.5 text-white">
       <div
         {...getRootProps()}
-        className="outline-dashed outline-2 outline-gray-100 hover:outline-yellow-400 w-full h-full rounded-md p-4 flex justify-center align-middle"
+        className="outline-dashed outline-2 outline-gray-100 hover:outline-yellow-400 w-full rounded-md p-4 flex justify-center align-middle"
       >
         <input {...getInputProps()} />
         {isDragActive ? (
@@ -98,6 +100,7 @@ export function InputAudio({
             variant="outline"
             size={'sm'}
             className="w-full"
+            disabled={disabled}
             onClick={() => setFileUrl(null)}
           >
             remove

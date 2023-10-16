@@ -69,14 +69,16 @@ export function InputVideo({
     onDrop,
     accept: {
       'video/*': ['.mp4', '.m4v', '.mov', '.webm', '.mkv', '.avi', '.wmv']
-    }
+    },
+    maxFiles: 1,
+    disabled: disabled
   });
 
   return (
     <div className="grid w-full space-y-4 max-w-sm items-center justify-center gap-1.5 text-white">
       <div
         {...getRootProps()}
-        className="outline-dashed outline-2 outline-gray-100 hover:outline-blue-500 w-full h-full rounded-md p-4 flex justify-center align-middle"
+        className="outline-dashed outline-2 outline-gray-100 hover:outline-yellow-500 w-full rounded-md p-4 flex justify-center align-middle"
       >
         <input {...getInputProps()} />
         {isDragActive ? (
@@ -98,6 +100,7 @@ export function InputVideo({
             variant="outline"
             size={'sm'}
             className="w-full"
+            disabled={disabled}
             onClick={() => setFileUrl(null)}
           >
             remove
