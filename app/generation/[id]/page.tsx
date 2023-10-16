@@ -8,14 +8,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import useSWR, { mutate } from 'swr';
 import { randomString } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
-import {
-  ArrowLeftIcon,
-  CommitIcon,
-  LightningBoltIcon,
-  RocketIcon,
-  SpeakerModerateIcon,
-  TrashIcon
-} from '@radix-ui/react-icons';
+import { ArrowLeftIcon, CommitIcon, TrashIcon } from '@radix-ui/react-icons';
 import { Badge } from '@/components/ui/badge';
 import NewGenerationButton from '@/app/generate/newGenerationButton';
 import Link from 'next/link';
@@ -122,10 +115,6 @@ export default function Generation({ params }: { params: { id: string } }) {
         }
 
         const responseOutput = await response.json();
-        console.log('output', JSON.stringify(responseOutput));
-        console.log('output status', responseOutput.output.status);
-        console.log('output url', responseOutput.output.url);
-
         if (responseOutput.output.status === 'FAILED') {
           //set generation status to failed
           const { error: updateError } = await supabase
@@ -164,7 +153,6 @@ export default function Generation({ params }: { params: { id: string } }) {
             }
 
             const urlData = await downloadResponse.json();
-            console.log('urlData', urlData);
             setOutput(urlData.url);
 
             const { error: updateError } = await supabase
@@ -253,7 +241,6 @@ export default function Generation({ params }: { params: { id: string } }) {
 
       // Get the generation id from the response
       const finalId = await response.json();
-      console.log('response', finalId);
       setFinalVideoId(finalId);
 
       //update the generation item with the generation id
