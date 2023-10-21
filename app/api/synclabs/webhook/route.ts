@@ -14,11 +14,24 @@ export async function POST(req: Request) {
     console.log('body', payload);
 
     if (payload.result.status === 'COMPLETED') {
-      const path = `generations/${payload.result.id}/${
+      const { data: generation, error } = await supabase
+        .from('generations')
+        .select('id')
+        .eq('output_video_id', payload.result.id)
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      const path = `generations/${generation.id}/${
         'output_video' + randomString(10) + '.mp4'
       }`;
 
-      const downloadResponse = await fetch(getURL() + '/api/download-video', {
+      const downloadUrl = getURL() + '/api/download-video';
+      console.log('downloadUrl', downloadUrl);
+
+      const downloadResponse = await fetch(downloadUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
