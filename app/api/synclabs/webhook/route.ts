@@ -14,16 +14,22 @@ export async function POST(req: Request) {
     console.log('body', payload);
 
     if (payload.result.status === 'COMPLETED') {
-      const { data: generation, error } = await supabase
+      const { data: generations, error } = await supabase
         .from('generations')
         .select('id')
-        .eq('output_video_id', payload.result.id)
-        .single();
+        .eq('output_video_id', payload.result.id);
 
       if (error) {
         throw error;
       }
 
+      if (!generations || generations.length === 0) {
+        throw new Error(
+          'No generation found with the provided output_video_id'
+        );
+      }
+
+      const generation = generations[0];
       const path = `generations/${generation.id}/${
         'output_video' + randomString(10) + '.mp4'
       }`;
