@@ -2,6 +2,7 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { randomString } from '@/lib/utils';
 import { cookies } from 'next/headers';
 import { Database } from '@/lib/database.types';
+import { getURL } from '@/utils/helpers';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +18,7 @@ export async function POST(req: Request) {
         'output_video' + randomString(10) + '.mp4'
       }`;
 
-      const downloadResponse = await fetch('/api/download-video', {
+      const downloadResponse = await fetch(getURL() + '/api/download-video', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
