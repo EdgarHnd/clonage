@@ -111,7 +111,7 @@ export const generateVideo = inngest.createFunction(
             videoUrl: generation.input_video,
             synergize: true,
             maxCredits: 100,
-            webhookUrl: getURL() + '/api/synclabs/webhook'
+            webhookUrl: getURL() + 'api/synclabs/webhook'
           })
         });
 
