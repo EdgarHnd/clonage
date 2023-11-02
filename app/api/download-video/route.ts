@@ -1,12 +1,13 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
-import { Database } from '@/lib/database.types';
+import { createClient } from '@supabase/supabase-js';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   if (req.method === 'POST') {
-    const supabase = createRouteHandlerClient<Database>({ cookies });
+    const supabase = createClient(
+      process.env.SUPABASE_URL as string,
+      process.env.SUPABASE_SERVICE_ROLE_KEY as string
+    );
 
     // get the video URL from the request body
     const { videoUrl, path } = await req.json();
