@@ -56,24 +56,45 @@ export async function POST(req: Request) {
 
       const urlData = await downloadResponse.json();
 
+      console.log('urlData', urlData);
+
       const { error: updateError } = await supabase
         .from('generations')
         .update({
           output_video: urlData.url,
           status: 'completed'
         })
-        .eq('id', payload.result.id);
+        .eq('id', generation.id);
+
+      console.log('updateComplete');
 
       if (updateError) {
         throw updateError;
       }
     } else if (payload.result.status === 'FAILED') {
+      const { data: generations, error } = await supabase
+        .from('generations')
+        .select('id')
+        .eq('output_video_id', payload.result.id);
+
+      if (error) {
+        throw error;
+      }
+
+      if (!generations || generations.length === 0) {
+        throw new Error(
+          'No generation found with the provided output_video_id'
+        );
+      }
+
+      const generation = generations[0];
+
       const { error: updateError } = await supabase
         .from('generations')
         .update({
           status: 'failed'
         })
-        .eq('id', payload.result.id);
+        .eq('id', generation.id);
 
       if (updateError) {
         throw updateError;
