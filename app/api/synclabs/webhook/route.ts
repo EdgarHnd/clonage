@@ -36,7 +36,7 @@ export async function POST(req: Request) {
         'output_video' + randomString(10) + '.mp4'
       }`;
 
-      const downloadUrl = getURL() + '/api/download-video';
+      const downloadUrl = getURL() + 'api/download-video';
       console.log('downloadUrl', downloadUrl);
 
       const downloadResponse = await fetch(downloadUrl, {
