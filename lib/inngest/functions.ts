@@ -144,15 +144,37 @@ export const onGenerationCompletion = inngest.createFunction(
       process.env.SUPABASE_URL as string,
       process.env.SUPABASE_SERVICE_ROLE_KEY as string
     );
-    const params = event.data.params;
-    const user = event.data.user;
-    const generation = event.data.generation;
+    const generationId = event.data.params.id;
 
-    // Update the generation item
-    await supabase
+    // Fetch the generation item
+    const { data: generation, error: fetchError } = await supabase
       .from('generations')
-      .update({ status: 'completed' })
-      .eq('id', params.id);
+      .select('*')
+      .eq('id', generationId)
+      .single();
+
+    if (fetchError) {
+      throw new Error(fetchError.message);
+    }
+
+    if (!generation) {
+      throw new Error('No generation item found');
+    }
+
+    // fetch the user
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', generation.user)
+      .single();
+
+    if (userError) {
+      throw new Error(userError.message);
+    }
+
+    if (!user) {
+      throw new Error('No user found');
+    }
 
     // Update credits
     await step.run('update-credits', async () => {
@@ -182,8 +204,32 @@ export const onGenerationCompletion = inngest.createFunction(
             credits_remaining: newCreditsRemaining,
             credits_used: newCreditsUsed
           })
-          .eq('id', user?.id);
+          .eq('id', user.id);
       }
+    });
+
+    //send email with Resend api
+    await step.run('send-email', async () => {
+      const email = user.email;
+      const generationUrl = getURL() + 'generation/' + generationId;
+      const url = getURL() + 'api/send';
+      const body = JSON.stringify({
+        generationUrl,
+        email
+      });
+      console.log('body', body);
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body
+      });
+      if (!response.ok) {
+        console.log(await response.text());
+        throw new Error('Server responded with status ' + response.status);
+      }
+      console.log('email sent to ' + email);
     });
 
     return generation;

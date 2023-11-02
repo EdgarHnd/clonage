@@ -1,6 +1,7 @@
 import { randomString } from '@/lib/utils';
 import { createClient } from '@supabase/supabase-js';
 import { getURL } from '@/utils/helpers';
+import { inngest } from '@/lib/inngest/client';
 
 export const dynamic = 'force-dynamic';
 
@@ -67,6 +68,18 @@ export async function POST(req: Request) {
         .eq('id', generation.id);
 
       console.log('updateComplete');
+
+      await inngest.send({
+        name: 'generation/completed',
+        data: {
+          params: {
+            id: generation.id
+          },
+        }
+      });
+
+      console.log('inngestComplete');
+
 
       if (updateError) {
         throw updateError;
