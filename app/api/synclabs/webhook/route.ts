@@ -74,12 +74,11 @@ export async function POST(req: Request) {
         data: {
           params: {
             id: generation.id
-          },
+          }
         }
       });
 
       console.log('inngestComplete');
-
 
       if (updateError) {
         throw updateError;

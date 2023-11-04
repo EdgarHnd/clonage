@@ -160,40 +160,36 @@ export const onGenerationCompletion = inngest.createFunction(
     if (!generation) {
       throw new Error('No generation item found');
     }
-
+    console.log('generation', generation);
     // fetch the user
-    const { data: user, error: userError } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', generation.user)
-      .single();
-
-    if (userError) {
-      throw new Error(userError.message);
+    const { data: user, error } = await supabase.auth.admin.getUserById(
+      generation.user
+    );
+    if (error) {
+      throw new Error(error.message);
     }
-
     if (!user) {
       throw new Error('No user found');
     }
-
+    const email = user.user.email;
     // Update credits
     await step.run('update-credits', async () => {
       const { data: creditData, error: creditError } = await supabase
         .from('credits')
         .select('*')
-        .eq('id', user.id);
+        .eq('id', generation.user);
 
       if (creditError) {
         throw new Error(creditError.message);
       }
-
+      console.log('creditData', creditData);
+      
       if (!creditData || creditData.length === 0) {
         console.log('No credits item found');
       } else if (
         creditData[0].credits_remaining &&
         creditData[0].credits_used !== null
       ) {
-        console.log('updating credits', creditData);
         const newCreditsRemaining = creditData[0].credits_remaining - 1;
         const newCreditsUsed = creditData[0].credits_used + 1;
         console.log('credits_remaining', newCreditsRemaining);
@@ -204,13 +200,13 @@ export const onGenerationCompletion = inngest.createFunction(
             credits_remaining: newCreditsRemaining,
             credits_used: newCreditsUsed
           })
-          .eq('id', user.id);
+          .eq('id', generation.user);
       }
+      return 'credits updated';
     });
 
     //send email with Resend api
     await step.run('send-email', async () => {
-      const email = user.email;
       const generationUrl = getURL() + 'generation/' + generationId;
       const url = getURL() + 'api/send';
       const body = JSON.stringify({
@@ -230,6 +226,7 @@ export const onGenerationCompletion = inngest.createFunction(
         throw new Error('Server responded with status ' + response.status);
       }
       console.log('email sent to ' + email);
+      return 'email sent';
     });
 
     return generation;
