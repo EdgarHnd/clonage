@@ -218,7 +218,7 @@ export default function Generation({ params }: { params: { id: string } }) {
           <div className="flex flex-col items-start space-y-4 md:w-1/2 md:mt-0 mt-4 w-full text-white h-[300px]">
             <Label htmlFor="script">script</Label>
             <Textarea
-              maxLength={300}
+              maxLength={800}
               disabled={data?.status != 'created'}
               id="script"
               value={script || ''}

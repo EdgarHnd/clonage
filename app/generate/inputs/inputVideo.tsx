@@ -44,7 +44,7 @@ export function InputVideo({
       console.log('file' + file);
 
       // check that the video file does not exceed 4.5MB
-      if (file.size > 11 * 1024 * 1024) {
+      if (file.size > 50 * 1024 * 1024) {
         toast({
           title: 'video exceeds size limit',
           description: 'the size of the video cannot exceed 11MB',
