@@ -59,8 +59,8 @@ export default function Generation({ params }: { params: { id: string } }) {
     setTranscript(data.transcription);
     setTargetLanguage(data.target_language);
     setTranslation(data.translation);
-    setOutput(data.generated_video);
-    setFinalVideoId(data.generated_video_id);
+    setOutput(data.output_video);
+    setFinalVideoId(data.output_video_id);
     setFinalOutputStatus(data.status);
   }, [data]);
 
