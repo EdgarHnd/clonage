@@ -86,7 +86,7 @@ export async function POST(req: Request) {
       console.log('updateComplete');
 
       await inngest.send({
-        name: `${table}/completed`,
+        name: `${table.slice(0, -1)}/completed`,
         data: {
           params: {
             id: item.id
