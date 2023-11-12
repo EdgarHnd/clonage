@@ -203,7 +203,7 @@ export default function Generation({ params }: { params: { id: string } }) {
       const { error: updateError2 } = await supabase
         .from('translations')
         .update({
-          generated_video_id: finalId
+          output_video_id: finalId
         })
         .eq('id', params.id);
 
