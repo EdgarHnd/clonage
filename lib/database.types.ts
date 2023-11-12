@@ -297,11 +297,11 @@ export interface Database {
       translations: {
         Row: {
           created_at: string
-          generated_audio: string | null
-          generated_video: string | null
-          generated_video_id: string | null
           id: string
           original_video: string | null
+          output_audio: string | null
+          output_video: string | null
+          output_video_id: string | null
           status: string | null
           target_language: string | null
           transcription: string | null
@@ -310,11 +310,11 @@ export interface Database {
         }
         Insert: {
           created_at?: string
-          generated_audio?: string | null
-          generated_video?: string | null
-          generated_video_id?: string | null
           id?: string
           original_video?: string | null
+          output_audio?: string | null
+          output_video?: string | null
+          output_video_id?: string | null
           status?: string | null
           target_language?: string | null
           transcription?: string | null
@@ -323,11 +323,11 @@ export interface Database {
         }
         Update: {
           created_at?: string
-          generated_audio?: string | null
-          generated_video?: string | null
-          generated_video_id?: string | null
           id?: string
           original_video?: string | null
+          output_audio?: string | null
+          output_video?: string | null
+          output_video_id?: string | null
           status?: string | null
           target_language?: string | null
           transcription?: string | null
