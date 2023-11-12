@@ -204,10 +204,10 @@ export default function Generation({ params }: { params: { id: string } }) {
     <div className="max-w-6xl px-4 py-8 mx-auto sm:py-24 sm:px-6 lg:px-8">
       <div className="flex flex-col items-center space-y-12">
         <div className="flex md:flex-row flex-col md:space-x-6 w-full items-start justify-center">
-          <div className="md:w-1/2 w-full flex flex-col space-y-4 items-center">
+          <div className="md:w-1/2 w-full flex flex-col space-y-4 items-start">
+            <Label>original video</Label>
             <InputVideo
               disabled={data?.status == 'completed'}
-              label="reference video"
               onFileChange={handleVideoFileChange}
               existingUrl={data?.input_video || ''}
             />
@@ -226,9 +226,6 @@ export default function Generation({ params }: { params: { id: string } }) {
               className=" w-full h-full p-4"
               placeholder="type your video script here"
             />
-            <Badge variant="secondary">
-              tips: try writing in another language 🇮🇳🇷🇺🇫🇷🇮🇹🇪🇸🇩🇪🏴󠁧󠁢󠁥󠁮󠁧󠁿🇨🇳🇯🇵🇦🇪🇸🇦🇺🇸
-            </Badge>
           </div>
         </div>
         <>{renderOutput()}</>

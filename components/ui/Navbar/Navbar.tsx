@@ -20,33 +20,37 @@ export default async function Navbar() {
       <a href="#skip" className="sr-only focus:not-sr-only">
         Skip to content
       </a>
-      <div className="max-w-6xl md:px-6 px-4 mx-auto">
-        <div className="relative flex flex-row justify-between py-4 align-center md:py-6">
+      <div className="max-w-6xl md:px-6 px-4 mx-auto bg-black">
+        <div className="relative flex flex-row justify-between py-4 align-center">
           <div className="flex items-center">
             <Link
               href="https://www.clonage.app"
-              target='_blank'
+              target="_blank"
               className="flex flex-row items-center"
               aria-label="Logo"
             >
               <Logo />
               <p className="text-2xl font-bold text-white ml-3">clonage</p>
-              <p className="relative -top-3 -left-2 text-xs text-red-500">
+              {/* <p className="relative -top-3 -left-2 text-xs text-red-500">
                 beta
-              </p>
+              </p> */}
             </Link>
-            <nav className="hidden ml-6 space-x-2 md:flex">
+            <nav className="hidden ml-12 space-x-6 md:flex">
               {user ? (
                 <>
-                  <Link href="/generate">
-                    generate
-                  </Link>
-                  <div className='flex flex-row items-center'>
+                  <Link href="/generate">generate</Link>
+                  <div className="flex flex-row items-center">
+                    <Link href="/translate">translate</Link>
+                  </div>
+                  <p className="relative -top-3 -left-6 text-xs text-red-500">
+                    new
+                  </p>
+                  {/* <div className='flex flex-row items-center'>
                     <p className="text-gray-500">one-click translate</p>
                     <p className="relative -top-3 -left-2 text-xs text-red-500">
                       coming soon
                     </p>
-                  </div>
+                  </div> */}
                 </>
               ) : (
                 <>

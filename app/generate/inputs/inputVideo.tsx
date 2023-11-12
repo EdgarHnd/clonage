@@ -9,14 +9,14 @@ import { Button } from '@/components/ui/button';
 
 interface InputVideoProps {
   onFileChange: (file: File | null) => void;
-  label?: string;
   existingUrl?: string;
   disabled?: boolean;
+  removeVideo?: () => void;
 }
 
 export function InputVideo({
   onFileChange,
-  label,
+  removeVideo,
   existingUrl,
   disabled
 }: InputVideoProps) {
@@ -65,6 +65,14 @@ export function InputVideo({
     [onFileChange]
   );
 
+  const onRemove = () => {
+    setFileUrl(null);
+    onFileChange(null);
+    if (removeVideo) {
+      removeVideo();
+    }
+  }
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
@@ -75,36 +83,37 @@ export function InputVideo({
   });
 
   return (
-    <div className="grid w-full space-y-4 max-w-sm items-center justify-center gap-1.5 text-white">
-      <div
-        {...getRootProps()}
-        className="outline-dashed outline-2 outline-gray-100 hover:outline-yellow-500 w-full rounded-md p-4 flex justify-center align-middle"
-      >
-        <input {...getInputProps()} />
-        {isDragActive ? (
-          <p className="self-center">drop the files here ...</p>
-        ) : (
-          <div className="flex justify-center flex-col items-center gap-2">
-            <UploadIcon className="mx-auto mb-2 text-gray-400" />
-            <p className="text-center">
-              drop your video here, or click to select file
-            </p>
-          </div>
-        )}
-      </div>
-      {fileUrl && (
-        <div>
+    <div className="flex flex-col space-y-2 w-full items-center text-white">
+      {fileUrl ? (
+        <>
           {' '}
-          <video className="rounded" src={fileUrl} controls />
+          <video className="rounded  h-[280px]" src={fileUrl} controls />
           <Button
             variant="outline"
             size={'sm'}
             className="w-full"
             disabled={disabled}
-            onClick={() => setFileUrl(null)}
+            onClick={onRemove}
           >
             remove
           </Button>
+        </>
+      ) : (
+        <div
+          {...getRootProps()}
+          className="outline-dashed outline-2 outline-gray-100 h-[270px] hover:outline-yellow-500 w-full rounded-md p-4 flex justify-center align-middle"
+        >
+          <input {...getInputProps()} />
+          {isDragActive ? (
+            <p className="self-center">drop the files here ...</p>
+          ) : (
+            <div className="flex justify-center flex-col items-center gap-2">
+              <UploadIcon className="mx-auto mb-2 text-gray-400" />
+              <p className="text-center">
+                drop your video here, or click to select file
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>

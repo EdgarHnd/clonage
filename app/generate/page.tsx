@@ -1,9 +1,7 @@
 import {
   getSession,
-  getUserDetails,
   getSubscription
 } from '@/app/supabase-server';
-import { Button } from '@/components/ui/button';
 import { redirect } from 'next/navigation';
 import GenerateComponent from './generateComponent';
 

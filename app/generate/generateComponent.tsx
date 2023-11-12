@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { UpdateIcon } from '@radix-ui/react-icons';
+import { Separator } from '@/components/ui/separator';
 
 type Generation = Database['public']['Tables']['generations']['Row'];
 
@@ -138,30 +139,37 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
   };
 
   return (
-    <div className="max-w-6xl px-4 py-8 mx-auto sm:py-24 sm:px-6 lg:px-8">
-      <div className="flex flex-col items-center space-y-12">
+    <div className="max-w-6xl px-4 py-8 mx-auto sm:px-6 lg:px-8">
+      <div className="flex flex-col space-y-4">
         <h1 className="text-white text-2xl font-bold">generate videos</h1>
+        <Separator className="bg-gray-600" />
         {loading ? (
           <UpdateIcon className="animate-spin ml-1" />
         ) : (
           <>
             {' '}
             {!voice ? (
-              <div className="flex flex-col items-center space-y-4 text-white">
-                <p>you don't have a voice yet</p>
+              <div className="flex flex-row items-center justify-between space-x-4 text-white">
+                <Badge variant={'secondary'}>no voice clone setup</Badge>
                 <Link href="/setup">
-                  <Button className="text-white">setup</Button>
+                  <Button variant={'secondary'}>setup</Button>
                 </Link>
               </div>
             ) : (
               <>
                 {hasPaid ? (
-                  <div className="text-center flex flex-col space-y-4 items-center">
-                    <p>thanks for subscribing!</p>
-                    <p>
-                      during beta, paying users get unlimited credits (but
-                      please be mindfull with the usage though 🙏)
-                    </p>
+                  <div className="text-center flex flex-row justify-between space-x-4 items-center">
+                    <Badge>
+                      {' '}
+                      you have {creditsRemaining} credits remaining
+                      <Link
+                        className="text-orange-500 hover:text-orange-400 ml-1"
+                        href="/pricing"
+                      >
+                        {' '}
+                        upgrade
+                      </Link>
+                    </Badge>
                     <div className="flex flex-row items-center space-x-4 text-white">
                       <Link href="/setup">
                         <Button className="text-white">change voice</Button>
@@ -170,15 +178,15 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
                     </div>
                   </div>
                 ) : creditsRemaining > 0 ? (
-                  <div className="text-center flex flex-col space-y-4 items-center">
+                  <div className="text-center flex flex-row space-x-4 justify-between items-center">
                     <p className="text-white text-center">
-                      You have {creditsRemaining} free credits remaining
+                      you have {creditsRemaining} credits remaining
                       <Link
                         className="text-orange-500 hover:text-orange-400"
                         href="/pricing"
                       >
                         {' '}
-                        subscribe for unlimited access during the beta
+                        upgrade
                       </Link>
                     </p>
                     <div className="flex flex-row items-center space-x-4 text-white">
@@ -189,7 +197,7 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
                     </div>
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center space-y-4 text-white">
+                  <div className="flex flex-row items-center justify-between space-x-4 text-white">
                     <p>you don't have any credits remaining</p>
                     <Link href="/pricing">
                       <Button variant="outline" className="text-white">
@@ -215,7 +223,7 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
                 </Badge>
               </CardHeader>
               <CardContent>
-                <p className="text-center">
+                <p className="text-center w-60 truncate">
                   {generation.input_text || 'click to complete generation'}
                 </p>
               </CardContent>

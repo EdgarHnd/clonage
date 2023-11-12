@@ -28,8 +28,8 @@ export default function CollapsibleMenu({ user }: CollapsibleMenuProps) {
       >
         {user ? (
           <>
-            <Link onClick={toggleMenu} href="/setup" className="">
-              setup
+            <Link onClick={toggleMenu} href="/translate" className="">
+              translate
             </Link>
             <Link onClick={toggleMenu} href="/generate" className="">
               generate

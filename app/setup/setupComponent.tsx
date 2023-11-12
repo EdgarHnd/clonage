@@ -1,10 +1,7 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { InputAudio } from '@/app/generate/inputs/inputAudio'; // Renamed component
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { useEffect, useState } from 'react';
-import { Input } from '@/components/ui/input';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import {
   Card,
@@ -15,22 +12,18 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { UpdateIcon } from '@radix-ui/react-icons';
-import { AudioRecorder } from 'react-audio-voice-recorder';
-import { Switch } from '@/components/ui/switch';
 import { randomString } from '@/lib/utils';
+import { Separator } from '@/components/ui/separator';
 
 export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
   const [loading, setLoading] = useState(false);
   const [voiceLoading, setVoiceLoading] = useState(false);
-  const [output, setOutput] = useState<any>(null);
   const [voice, setVoice] = useState<string>(''); // Renamed state variable
   const [audioFile, setAudioFile] = useState<File>();
-  const [voiceName, setVoiceName] = useState<string>('');
   const [voiceDescription, setVoiceDescription] = useState<string>('');
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [isTextVisible, setIsTextVisible] = useState(false);
 
   const fetchVoice = async () => {
     setVoiceLoading(true);
@@ -85,10 +78,7 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
       setErrorMessage('Audio file is missing. Please upload an audio file.');
       return;
     }
-/*     if (!voiceName) {
-      setErrorMessage('Voice name is missing. Please enter a voice name.');
-      return;
-    } */
+
     try {
       setLoading(true);
       const data = new FormData();
@@ -144,20 +134,11 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
     }
   };
 
-  const handleAudioRecorded = (newBlob: Blob | null) => {
-    if (newBlob) {
-      console.log('newBlob' + JSON.stringify(newBlob));
-      const newFile = new File([newBlob], 'recorded_audio.webm', {
-        type: 'audio/webm'
-      });
-      handleAudioFileChange(newFile);
-    }
-  };
-
   return (
-    <div className="max-w-6xl px-4 py-8 mx-auto sm:py-24 sm:px-6 lg:px-8">
-      <div className="flex flex-col items-center space-y-12">
+    <div className="max-w-6xl px-4 py-8 mx-auto sm:px-6 lg:px-8">
+      <div className="flex flex-col items-start space-y-4">
         <h1 className="text-white text-2xl font-bold">voice cloning</h1>
+        <Separator className="bg-gray-600" />
         {voiceLoading ? (
           <div>
             {' '}
@@ -166,7 +147,7 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
         ) : (
           <>
             {voice ? (
-              <Card className="flex flex-col items-center bg-black border-gray-600">
+              <Card className="flex flex-col items-start bg-black border-gray-600">
                 <CardHeader>
                   <h2 className="text-white text-lg font-bold">
                     personal voice
@@ -192,74 +173,15 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
                       )}
                     </Button>
                     <Link href="/generate">
-                      <Button variant="secondary">generate video</Button>
+                      <Button variant="secondary">generate videos</Button>
                     </Link>
                   </div>
-                  {hasPaid ? (
-                    <p className="text-white text-sm">
-                      thanks for subscribing, during beta only one voice can be
-                      saved
-                    </p>
-                  ) : (
-                    <p className="text-white text-sm">
-                      on free plan, all voices are deleted after 1h
-                      <Link
-                        href="/pricing"
-                        className="text-orange-500 hover:text-orange-300 ml-1"
-                      >
-                        (upgrade)
-                      </Link>
-                    </p>
-                  )}
                 </CardFooter>
               </Card>
             ) : (
               <>
                 <div className="flex flex-col md:flex-row md:space-x-6 w-full items-start justify-center">
                   <div className="md:w-1/2 w-full flex flex-col space-y-8 items-center text-center">
-                   {/*  <p className="md:w-1/2">
-                      record or upload a voice sample (30s)
-                    </p>
-                    <div className="flex flex-row items-center w-full justify-center space-x-2">
-                      <p className="text-sm text-gray-600 md:w-1/2">
-                        show script example
-                      </p>
-                      <Switch
-                        checked={isTextVisible}
-                        onCheckedChange={setIsTextVisible}
-                      />
-                    </div>
-                    {isTextVisible && (
-                      <div className="text-sm text-start">
-                        <p>
-                          Hello everyone! <br /> Have you heard about Clonage?{' '}
-                          <br /> It's this cool app that lets you create
-                          unlimited videos from just one sample of yourself!
-                          <br />
-                          And that’s not all; it supports various languages!
-                          Imagine the possibilities – reaching out and
-                          connecting, no matter the language.
-                          <br />
-                          Do you know about Buildspace? <br />
-                          It’s the spot where ideas turn into reality. Whether
-                          it’s apps, YouTube channels, games, art, AI, or music,
-                          there’s space for every idea!
-                          <br />
-                          So, why not explore Clonage and give your feedback
-                          about the experience? <br /> I'd love to hear from
-                          you!
-                        </p>
-                      </div>
-                    )}
-                    <AudioRecorder
-                      onRecordingComplete={handleAudioRecorded}
-                      audioTrackConstraints={{
-                        noiseSuppression: true,
-                        echoCancellation: true
-                      }}
-                      showVisualizer={true}
-                      downloadFileExtension="webm"
-                    /> */}
                     <p className="text-sm text-gray-600 md:w-3/4 text-start">
                       upload an audio or video of yourself talking clearly
                       without background noise (max size 11MB)
@@ -270,26 +192,12 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
                       onFileChange={handleAudioFileChange}
                     />
                   </div>
-                  {/* <div className="w-full md:w-1/2 text-white flex flex-col space-y-4 md:mt-0 mt-4">
-                    <Label htmlFor="voiceName">voice name</Label>
-                    <Input
-                      id="voiceName"
-                      value={voiceName}
-                      onChange={(e) => setVoiceName(e.target.value)}
-                      className=" w-full h-full p-4"
-                      placeholder="enter voice name."
-                    />
-                    <Label htmlFor="voiceDescription">voice description</Label>
-                    <Textarea
-                      id="voiceDescription"
-                      value={voiceDescription}
-                      onChange={(e) => setVoiceDescription(e.target.value)}
-                      className=" w-full h-full p-4"
-                      placeholder="enter voice description."
-                    />
-                  </div> */}
                 </div>
-                <Button variant="secondary" className="mt-8" onClick={handleClick}>
+                <Button
+                  variant="secondary"
+                  className="mt-8"
+                  onClick={handleClick}
+                >
                   {loading ? (
                     <>
                       cloning voice <UpdateIcon className="animate-spin ml-1" />
@@ -302,6 +210,21 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
               </>
             )}
           </>
+        )}
+        {hasPaid ? (
+          <p className="text-white text-sm">
+            thanks for subscribing, only 1 voice can be saved for now
+          </p>
+        ) : (
+          <p className="text-white text-sm">
+            on free plan, all voices are deleted after 1h
+            <Link
+              href="/pricing"
+              className="text-orange-500 hover:text-orange-300 ml-1"
+            >
+              (upgrade)
+            </Link>
+          </p>
         )}
       </div>
     </div>

@@ -17,23 +17,39 @@ export async function POST(req: Request) {
     console.log('body', payload);
 
     if (payload.result.status === 'COMPLETED') {
-      const { data: generations, error } = await supabase
+      let { data: items, error } = await supabase
         .from('generations')
         .select('id')
         .eq('output_video_id', payload.result.id);
+
+      let table = 'generations';
 
       if (error) {
         throw error;
       }
 
-      if (!generations || generations.length === 0) {
-        throw new Error(
-          'No generation found with the provided output_video_id'
-        );
+      if (!items || items.length === 0) {
+        const { data: translations, error: translationsError } = await supabase
+          .from('translations')
+          .select('id')
+          .eq('output_video_id', payload.result.id);
+
+        if (translationsError) {
+          throw translationsError;
+        }
+
+        if (!translations || translations.length === 0) {
+          throw new Error(
+            'No generation found with the provided output_video_id in both generations and translations tables'
+          );
+        }
+
+        items = translations;
+        table = 'translations';
       }
 
-      const generation = generations[0];
-      const path = `generations/${generation.id}/${
+      const item = items[0];
+      const path = `${table}/${item.id}/${
         'output_video' + randomString(10) + '.mp4'
       }`;
 
@@ -60,20 +76,20 @@ export async function POST(req: Request) {
       console.log('urlData', urlData);
 
       const { error: updateError } = await supabase
-        .from('generations')
+        .from(table)
         .update({
           output_video: urlData.url,
           status: 'completed'
         })
-        .eq('id', generation.id);
+        .eq('id', item.id);
 
       console.log('updateComplete');
 
       await inngest.send({
-        name: 'generation/completed',
+        name: `${table}/completed`,
         data: {
           params: {
-            id: generation.id
+            id: item.id
           }
         }
       });
@@ -84,29 +100,45 @@ export async function POST(req: Request) {
         throw updateError;
       }
     } else if (payload.result.status === 'FAILED') {
-      const { data: generations, error } = await supabase
+      let { data: items, error } = await supabase
         .from('generations')
         .select('id')
         .eq('output_video_id', payload.result.id);
+
+      let table = 'generations';
 
       if (error) {
         throw error;
       }
 
-      if (!generations || generations.length === 0) {
-        throw new Error(
-          'No generation found with the provided output_video_id'
-        );
+      if (!items || items.length === 0) {
+        const { data: translations, error: translationsError } = await supabase
+          .from('translations')
+          .select('id')
+          .eq('output_video_id', payload.result.id);
+
+        if (translationsError) {
+          throw translationsError;
+        }
+
+        if (!translations || translations.length === 0) {
+          throw new Error(
+            'No generation found with the provided output_video_id in both generations and translations tables'
+          );
+        }
+
+        items = translations;
+        table = 'translations';
       }
 
-      const generation = generations[0];
+      const item = items[0];
 
       const { error: updateError } = await supabase
-        .from('generations')
+        .from(table)
         .update({
           status: 'failed'
         })
-        .eq('id', generation.id);
+        .eq('id', item.id);
 
       if (updateError) {
         throw updateError;

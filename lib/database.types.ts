@@ -32,6 +32,7 @@ export interface Database {
           {
             foreignKeyName: "credits_id_fkey"
             columns: ["id"]
+            isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
           }
@@ -54,6 +55,7 @@ export interface Database {
           {
             foreignKeyName: "customers_id_fkey"
             columns: ["id"]
+            isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
           }
@@ -133,12 +135,14 @@ export interface Database {
           {
             foreignKeyName: "generations_user_fkey"
             columns: ["user"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "generations_voice_fkey"
             columns: ["voice"]
+            isOneToOne: false
             referencedRelation: "voices"
             referencedColumns: ["id"]
           }
@@ -188,6 +192,7 @@ export interface Database {
           {
             foreignKeyName: "prices_product_id_fkey"
             columns: ["product_id"]
+            isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
           }
@@ -276,12 +281,64 @@ export interface Database {
           {
             foreignKeyName: "subscriptions_price_id_fkey"
             columns: ["price_id"]
+            isOneToOne: false
             referencedRelation: "prices"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "subscriptions_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      translations: {
+        Row: {
+          created_at: string
+          generated_audio: string | null
+          generated_video: string | null
+          generated_video_id: string | null
+          id: string
+          original_video: string | null
+          status: string | null
+          target_language: string | null
+          transcription: string | null
+          translation: string | null
+          user: string | null
+        }
+        Insert: {
+          created_at?: string
+          generated_audio?: string | null
+          generated_video?: string | null
+          generated_video_id?: string | null
+          id?: string
+          original_video?: string | null
+          status?: string | null
+          target_language?: string | null
+          transcription?: string | null
+          translation?: string | null
+          user?: string | null
+        }
+        Update: {
+          created_at?: string
+          generated_audio?: string | null
+          generated_video?: string | null
+          generated_video_id?: string | null
+          id?: string
+          original_video?: string | null
+          status?: string | null
+          target_language?: string | null
+          transcription?: string | null
+          translation?: string | null
+          user?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "translations_user_fkey"
+            columns: ["user"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           }
@@ -313,6 +370,7 @@ export interface Database {
           {
             foreignKeyName: "users_id_fkey"
             columns: ["id"]
+            isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
           }
@@ -350,6 +408,7 @@ export interface Database {
           {
             foreignKeyName: "voices_user_fkey"
             columns: ["user"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           }
