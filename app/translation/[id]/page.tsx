@@ -142,7 +142,7 @@ export default function Generation({ params }: { params: { id: string } }) {
         })
         .eq('id', params.id);
 
-      const response = await fetch(`/api/translate/${params.id}`, {
+      const response = await fetch(`/api/translate-text/${params.id}`, {
         method: 'POST'
       });
 
