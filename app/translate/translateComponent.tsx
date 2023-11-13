@@ -114,7 +114,7 @@ export default function TranslateComponent({ hasPaid }: { hasPaid: boolean }) {
           <UpdateIcon className="animate-spin ml-1" />
         ) : (
           <>
-            {hasPaid ? (
+            {!hasPaid ? (
               <div className="text-center flex flex-row space-x-4 items-center justify-between">
                 <Badge>
                   You have {creditsRemaining} credits remaining
@@ -131,7 +131,7 @@ export default function TranslateComponent({ hasPaid }: { hasPaid: boolean }) {
                 </div>
               </div>
             ) : creditsRemaining > 0 ? (
-              <div className="text-center flex flex-col space-y-4 items-center">
+              <div className="text-center flex flex-row space-x-4 items-center justify-between">
                 <Badge>
                   You have {creditsRemaining} credits remaining
                   <Link
@@ -147,7 +147,7 @@ export default function TranslateComponent({ hasPaid }: { hasPaid: boolean }) {
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col items-center space-y-4 text-white">
+              <div className="flex flex-row space-x-4 items-center justify-between text-white">
                 <Badge>you don't have any credits remaining</Badge>
                 <Link href="/pricing">
                   <Button variant="outline" className="text-white">
