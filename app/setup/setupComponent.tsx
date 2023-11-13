@@ -179,10 +179,10 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
                 </CardFooter>
               </Card>
             ) : (
-              <>
-                <div className="flex flex-col md:flex-row md:space-x-6 w-full items-start justify-center">
-                  <div className="md:w-1/2 w-full flex flex-col space-y-8 items-center text-center">
-                    <p className="text-sm text-gray-600 md:w-3/4 text-start">
+              <div className="flex flex-col md:items-start items-center space-y-4">
+                <div className="flex flex-col md:flex-row w-full items-start justify-between">
+                  <div className="md:w-1/2 w-full flex flex-col space-y-8 items-start">
+                    <p className="text-sm text-gray-600 text-start">
                       upload an audio or video of yourself talking clearly
                       without background noise (max size 11MB)
                     </p>
@@ -207,7 +207,7 @@ export default function SetupComponent({ hasPaid }: { hasPaid: boolean }) {
                   )}
                 </Button>
                 <p className="text-xs text-red-800">{errorMessage}</p>
-              </>
+              </div>
             )}
           </>
         )}
