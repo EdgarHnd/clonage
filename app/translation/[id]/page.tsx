@@ -21,6 +21,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { ScrollArea } from '@radix-ui/react-scroll-area';
+import { useToast } from '@/components/ui/use-toast';
 
 type Translation = Database['public']['Tables']['translations']['Row'];
 
@@ -39,6 +40,7 @@ export default function Generation({ params }: { params: { id: string } }) {
   const supabase = createClientComponentClient();
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const { toast } = useToast();
 
   const { data, error } = useSWR<Translation>(
     `/api/translation/${params.id}`,
@@ -195,6 +197,7 @@ export default function Generation({ params }: { params: { id: string } }) {
       const { error: updateError } = await supabase
         .from('translations')
         .update({
+          translation: translation,
           status: 'processing'
         })
         .eq('id', params.id);
@@ -273,6 +276,32 @@ export default function Generation({ params }: { params: { id: string } }) {
         .eq('id', params.id);
       if (updateError) {
         throw updateError;
+      }
+    } catch (error: any) {
+      setErrorMessage(error.message);
+      console.log(error.message);
+    } finally {
+      mutate(`/api/translation/${params.id}`);
+    }
+  };
+
+  const handleTranslationBlur = async () => {
+    try {
+      // Only update if the translation has changed
+      if (translation !== data?.translation) {
+        const { error } = await supabase
+          .from('translations')
+          .update({ translation: translation })
+          .eq('id', params.id);
+  
+        if (error) {
+          throw error;
+        }
+        toast({
+          title: 'translation saved',
+          description: 'the translation was successfully saved',
+          duration: 2000
+        });
       }
     } catch (error: any) {
       setErrorMessage(error.message);
@@ -449,6 +478,7 @@ export default function Generation({ params }: { params: { id: string } }) {
                 id="script"
                 value={translation || ''}
                 onChange={(e) => setTranslation(e.target.value)}
+                onBlur={handleTranslationBlur}
                 className=" w-full h-full p-4"
                 placeholder="the generated translation will show here"
               />
