@@ -38,13 +38,13 @@ export default async function Navbar() {
             <nav className="hidden ml-12 space-x-6 md:flex">
               {user ? (
                 <>
-                  <Link href="/generate">generate</Link>
+                  {/* <Link href="/generate">generate</Link> */}
                   <div className="flex flex-row items-center">
                     <Link href="/translate">translate</Link>
                   </div>
-                  <p className="relative -top-3 -left-6 text-xs text-red-500">
+                  {/*  <p className="relative -top-3 -left-6 text-xs text-red-500">
                     new
-                  </p>
+                  </p> */}
                   {/* <div className='flex flex-row items-center'>
                     <p className="text-gray-500">one-click translate</p>
                     <p className="relative -top-3 -left-2 text-xs text-red-500">

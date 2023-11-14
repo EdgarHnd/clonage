@@ -1,10 +1,11 @@
 import SupabaseProvider from './supabase-provider';
 import Footer from '@/components/ui/Footer';
 import Navbar from '@/components/ui/Navbar';
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from '@/components/ui/toaster';
 import { PropsWithChildren } from 'react';
 import 'styles/main.css';
 import { Analytics } from '@vercel/analytics/react';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 const meta = {
   title: 'Clonage - create unlimited videos, just add your script',
@@ -50,16 +51,18 @@ export default function RootLayout({
     <html lang="en">
       <body className="bg-black loading text-white">
         <SupabaseProvider>
-          <Navbar />
-          <main
-            id="skip"
-            className="min-h-[calc(100dvh-4rem)] md:min-h[calc(100dvh-5rem)]"
-          >
-            {children}
-            <Analytics />
-          </main>
-          <Footer />
-          <Toaster />
+          <TooltipProvider delayDuration={800} skipDelayDuration={500} >
+            <Navbar />
+            <main
+              id="skip"
+              className="min-h-[calc(100dvh-4rem)] md:min-h[calc(100dvh-5rem)]"
+            >
+              {children}
+              <Analytics />
+            </main>
+            <Footer />
+            <Toaster />
+          </TooltipProvider>
         </SupabaseProvider>
       </body>
     </html>

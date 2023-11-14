@@ -386,7 +386,7 @@ export default function Generation({ params }: { params: { id: string } }) {
                   id="script"
                   value={transcript || ''}
                   onChange={(e) => setTranscript(e.target.value)}
-                  className=" w-full h-full p-4"
+                  className="w-full h-full p-4 border-gray-800"
                   placeholder="the original video transcript will show here"
                 />
               )}
@@ -394,7 +394,7 @@ export default function Generation({ params }: { params: { id: string } }) {
             <div className="flex mt-4 flex-row space-x-4">
               <Select
                 disabled={
-                  (data?.status != 'transribed' &&
+                  (data?.status != 'transcribed' &&
                     data?.status != 'translated') ||
                   !transcript
                 }
@@ -477,7 +477,7 @@ export default function Generation({ params }: { params: { id: string } }) {
                 value={translation || ''}
                 onChange={(e) => setTranslation(e.target.value)}
                 onBlur={handleTranslationBlur}
-                className=" w-full h-full p-4"
+                className="w-full h-full p-4 border-gray-800"
                 placeholder="the generated translation will show here"
               />
             )}

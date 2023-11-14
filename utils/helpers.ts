@@ -1,4 +1,4 @@
-import { Database } from "@/lib/database.types";
+import { Database } from '@/lib/database.types';
 
 type Price = Database['public']['Tables']['prices']['Row'];
 
@@ -44,3 +44,39 @@ export const toDateTime = (secs: number) => {
   t.setSeconds(secs);
   return t;
 };
+
+export function getFlag(language: string): string {
+  const languageFlags: { [key: string]: string } = {
+    english: '🇬🇧',
+    japanese: '🇯🇵',
+    chinese: '🇨🇳',
+    german: '🇩🇪',
+    hindi: '🇮🇳',
+    french: '🇫🇷',
+    korean: '🇰🇷',
+    portuguese: '🇵🇹',
+    italian: '🇮🇹',
+    spanish: '🇪🇸',
+    indonesian: '🇮🇩',
+    dutch: '🇳🇱',
+    turkish: '🇹🇷',
+    filipino: '🇵🇭',
+    polish: '🇵🇱',
+    swedish: '🇸🇪',
+    bulgarian: '🇧🇬',
+    romanian: '🇷🇴',
+    arabic: '🇸🇦',
+    czech: '🇨🇿',
+    greek: '🇬🇷',
+    finnish: '🇫🇮',
+    croatian: '🇭🇷',
+    malay: '🇲🇾',
+    slovak: '🇸🇰',
+    danish: '🇩🇰',
+    tamil: '🇮🇳',
+    ukrainian: '🇺🇦',
+    russian: '🇷🇺'
+  };
+
+  return languageFlags[language] || '';
+}

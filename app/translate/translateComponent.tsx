@@ -10,6 +10,12 @@ import Link from 'next/link';
 import { UpdateIcon } from '@radix-ui/react-icons';
 import NewTranslationButton from './newTranslationButton';
 import { Separator } from '@/components/ui/separator';
+import TranslationCard from './translationCard';
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent
+} from '@/components/ui/tooltip';
 
 type Translation = Database['public']['Tables']['translations']['Row'];
 
@@ -109,23 +115,9 @@ export default function TranslateComponent({ hasPaid }: { hasPaid: boolean }) {
   }, []);
 
   const router = useRouter();
+
   const handleGenerationClick = (id: string) => () => {
     router.push(`/translation/${id}`);
-  };
-
-  const badgecolor = (status: string | null) => {
-    switch (status) {
-      case 'created':
-        return 'bg-yellow-500 hover:bg-yellow-500';
-      case 'processing':
-        return 'bg-yellow-500 hover:bg-yellow-500';
-      case 'completed':
-        return 'bg-green-500 hover:bg-green-500';
-      case 'failed':
-        return 'bg-red-500 hover:bg-red-500';
-      default:
-        return 'bg-yellow-500 hover:bg-yellow-500';
-    }
   };
 
   return (
@@ -173,31 +165,16 @@ export default function TranslateComponent({ hasPaid }: { hasPaid: boolean }) {
               <div className="flex flex-row space-x-4 items-center justify-between">
                 <Badge>you don't have any credits remaining</Badge>
                 <Link href="/pricing">
-                  <Button variant="secondary">
-                    subscribe
-                  </Button>
+                  <Button variant="secondary">subscribe</Button>
                 </Link>
               </div>
             )}
-            <div className="grid md:grid-cols-4 grid-cols-1 gap-4">
+            <div className="grid md:grid-cols-3 lg:grid-cols-4 grid-cols-2 gap-4">
               {translations.map((translation) => (
-                <Card
+                <TranslationCard
+                  translation={translation}
                   onClick={handleGenerationClick(translation.id)}
-                  className="text-white flex flex-col items-center border-gray-600 bg-black p-4 space-y-4 cursor-pointer"
-                  key={translation.id}
-                >
-                  <CardHeader>
-                    <Badge className={badgecolor(translation.status)}>
-                      {translation.status}
-                    </Badge>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-center w-60 truncate">
-                      {translation.transcription ||
-                        'click to complete translation'}
-                    </p>
-                  </CardContent>
-                </Card>
+                />
               ))}
             </div>
           </>
