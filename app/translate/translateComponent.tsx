@@ -114,7 +114,7 @@ export default function TranslateComponent({ hasPaid }: { hasPaid: boolean }) {
           <UpdateIcon className="animate-spin ml-1" />
         ) : (
           <>
-            {!hasPaid ? (
+            {hasPaid ? (
               <div className="text-center flex flex-row space-x-4 items-center justify-between">
                 <Badge>
                   You have {creditsRemaining} credits remaining
