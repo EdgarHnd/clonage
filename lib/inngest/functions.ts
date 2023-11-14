@@ -643,7 +643,7 @@ export const translateVideo = inngest.createFunction(
             audioUrl: generateAudio,
             videoUrl: translation.original_video,
             synergize: true,
-            maxCredits: 100,
+            maxCredits: 300,
             webhookUrl: getURL() + 'api/synclabs/webhook'
           })
         });
