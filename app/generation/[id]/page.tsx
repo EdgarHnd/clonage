@@ -43,23 +43,23 @@ export default function Generation({ params }: { params: { id: string } }) {
     }
   );
 
-  const subscription = supabase
-    .channel('generation-channel')
-    .on(
-      'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'generations',
-        filter: 'id=eq.' + params.id
-      },
-      (payload) => {
-        mutate(`/api/generation/${params.id}`);
-      }
-    )
-    .subscribe();
-
   useEffect(() => {
+    const subscription = supabase
+      .channel('generation-channel')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'generations',
+          filter: 'id=eq.' + params.id
+        },
+        (payload) => {
+          mutate(`/api/generation/${params.id}`);
+        }
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(subscription);
     };

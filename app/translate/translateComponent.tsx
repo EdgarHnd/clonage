@@ -19,23 +19,23 @@ export default function TranslateComponent({ hasPaid }: { hasPaid: boolean }) {
   const [loading, setLoading] = useState(false);
   const supabase = createClientComponentClient();
 
-  const subscription = supabase
-    .channel('translations-channel')
-    .on(
-      'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'translations'
-      },
-      (payload) => {
-        fetchTranslations();
-        fetchCreditsRemaining();
-      }
-    )
-    .subscribe();
-
   useEffect(() => {
+    const subscription = supabase
+      .channel('translations-channel')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'translations'
+        },
+        (payload) => {
+          fetchTranslations();
+          fetchCreditsRemaining();
+        }
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(subscription);
     };

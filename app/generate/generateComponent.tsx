@@ -19,23 +19,23 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
   const [loading, setLoading] = useState(false);
   const supabase = createClientComponentClient();
 
-  const subscription = supabase
-    .channel('generations-channel')
-    .on(
-      'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'generations'
-      },
-      (payload) => {
-        fetchGenerations();
-        fetchCreditsRemaining();
-      }
-    )
-    .subscribe();
-
   useEffect(() => {
+    const subscription = supabase
+      .channel('generations-channel')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'generations'
+        },
+        (payload) => {
+          fetchGenerations();
+          fetchCreditsRemaining();
+        }
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(subscription);
     };
