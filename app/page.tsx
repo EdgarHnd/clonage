@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 export default async function LandingPage() {
   const session = await getSession();
   if (session) {
-    return redirect('/generate');
+    return redirect('/translate');
   } else {
     return redirect('/signin');
   }

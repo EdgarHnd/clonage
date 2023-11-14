@@ -1,5 +1,6 @@
 'use client';
 import { Button } from '@/components/ui/button';
+import { PlusIcon } from '@radix-ui/react-icons';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -20,12 +21,15 @@ const NewTranslationButton = () => {
         throw new Error('User not found');
       }
 
-      const { data, error } = await supabase.from('translations').insert([
-        {
-          user: user.id,
-          status: 'created'
-        }
-      ]).select();
+      const { data, error } = await supabase
+        .from('translations')
+        .insert([
+          {
+            user: user.id,
+            status: 'created'
+          }
+        ])
+        .select();
 
       if (error) {
         throw new Error(`Error creating new translation: ${error.message}`);
@@ -45,8 +49,16 @@ const NewTranslationButton = () => {
   };
 
   return (
-    <Button disabled={loading} variant="secondary" onClick={handleCreateGeneration}>
-      {loading ? 'loading...' : 'create new'}
+    <Button
+      disabled={loading}
+      variant="secondary"
+      onClick={handleCreateGeneration}
+      className="flex items-center md:space-x-2"
+    >
+      <PlusIcon className="h-5 w-5" />
+      <div className="hidden sm:block">
+        {loading ? 'loading...' : 'create new'}
+      </div>
     </Button>
   );
 };

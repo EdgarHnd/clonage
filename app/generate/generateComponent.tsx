@@ -181,12 +181,12 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
             ) : (
               <>
                 {hasPaid ? (
-                  <div className="text-center flex flex-row justify-between space-x-4 items-center">
-                    <Badge>
+                  <div className="flex flex-row justify-between space-x-4 items-center">
+                    <Badge className="flex flex-col md:flex-row text-center md:text-start">
                       {' '}
                       you have {creditsRemaining} credits remaining
                       <Link
-                        className="text-orange-500 hover:text-orange-400 ml-1"
+                        className="text-orange-500 hover:text-orange-400 mt-1 md:ml-1 md:mt-0"
                         href="/pricing"
                       >
                         {' '}
@@ -201,8 +201,9 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
                     </div>
                   </div>
                 ) : creditsRemaining > 0 ? (
-                  <div className="text-center flex flex-row space-x-4 justify-between items-center">
-                    <p className="text-white text-center">
+                  <div className="flex flex-row space-x-4 justify-between items-center">
+                    <Badge className="flex flex-col md:flex-row text-center md:text-start">
+                      {' '}
                       you have {creditsRemaining} credits remaining
                       <Link
                         className="text-orange-500 hover:text-orange-400"
@@ -211,7 +212,7 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
                         {' '}
                         upgrade
                       </Link>
-                    </p>
+                    </Badge>
                     <div className="flex flex-row items-center space-x-4 text-white">
                       <Link href="/setup">
                         <Button className="text-white">change voice</Button>
@@ -221,9 +222,9 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
                   </div>
                 ) : (
                   <div className="flex flex-row items-center justify-between space-x-4 text-white">
-                    <p>you don't have any credits remaining</p>
+                    <Badge>you don't have any credits remaining</Badge>
                     <Link href="/pricing">
-                      <Button variant="outline" className="text-white">
+                      <Button variant="secondary">
                         subscribe
                       </Button>
                     </Link>

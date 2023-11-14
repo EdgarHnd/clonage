@@ -442,7 +442,7 @@ export default function Generation({ params }: { params: { id: string } }) {
               </div>
             ) : (
               <Textarea
-                maxLength={800}
+                maxLength={3000}
                 disabled={
                   data?.status != 'transcribed' && data?.status != 'translated'
                 }
