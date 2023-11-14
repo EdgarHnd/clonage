@@ -382,7 +382,7 @@ export const transcribeVideo = inngest.createFunction(
           .from('translations')
           .update({
             transcription: transcripted.text,
-            status: 'created'
+            status: 'transcribed'
           })
           .eq('id', translationId);
 
@@ -603,6 +603,30 @@ export const translateVideo = inngest.createFunction(
       console.log('audioUrl' + audioUrl);
 
       return audioUrl;
+    });
+
+    await step.run('delete-voice', async () => {
+      try {
+        const response = await fetch(
+          `https://api.elevenlabs.io/v1/voices/${clonedVoice}`,
+          {
+            method: 'DELETE',
+            headers: {
+              accept: 'application/json',
+              'xi-api-key': process.env.ELEVENLABS_API_TOKEN as string
+            }
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to delete voice from Eleven Labs API');
+        }
+
+        return 'Voice deleted successfully';
+      } catch (error: any) {
+        console.log(error);
+        throw new Error(`Server Error: ${error.message}`);
+      }
     });
 
     // Generate video
