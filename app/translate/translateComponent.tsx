@@ -174,6 +174,7 @@ export default function TranslateComponent({ hasPaid }: { hasPaid: boolean }) {
                 <TranslationCard
                   translation={translation}
                   onClick={handleGenerationClick(translation.id)}
+                  key={translation.id}
                 />
               ))}
             </div>
