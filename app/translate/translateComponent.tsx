@@ -17,6 +17,29 @@ export default function TranslateComponent({ hasPaid }: { hasPaid: boolean }) {
   const [translations, setTranslations] = useState<Translation[]>([]);
   const [creditsRemaining, setCreditsRemaining] = useState<number>(0);
   const [loading, setLoading] = useState(false);
+  const supabase = createClientComponentClient();
+
+  const subscription = supabase
+    .channel('translations-channel')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'translations'
+      },
+      (payload) => {
+        fetchTranslations();
+        fetchCreditsRemaining();
+      }
+    )
+    .subscribe();
+
+  useEffect(() => {
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, []);
 
   const fetchCreditsRemaining = async () => {
     try {

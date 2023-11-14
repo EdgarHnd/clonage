@@ -17,6 +17,29 @@ export default function GenerateComponent({ hasPaid }: { hasPaid: boolean }) {
   const [generations, setGenerations] = useState<Generation[]>([]);
   const [creditsRemaining, setCreditsRemaining] = useState<number>(0);
   const [loading, setLoading] = useState(false);
+  const supabase = createClientComponentClient();
+
+  const subscription = supabase
+    .channel('generations-channel')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'generations'
+      },
+      (payload) => {
+        fetchGenerations();
+        fetchCreditsRemaining();
+      }
+    )
+    .subscribe();
+
+  useEffect(() => {
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, []);
 
   const fetchCreditsRemaining = async () => {
     try {

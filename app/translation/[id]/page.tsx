@@ -21,8 +21,6 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { ScrollArea } from '@radix-ui/react-scroll-area';
-import { Separator } from '@/components/ui/separator';
-import { inngest } from '@/lib/inngest/client';
 
 type Translation = Database['public']['Tables']['translations']['Row'];
 
@@ -53,6 +51,28 @@ export default function Generation({ params }: { params: { id: string } }) {
       return data;
     }
   );
+
+  const subscription = supabase
+    .channel('translation-channel')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'translations',
+        filter: 'id=eq.' + params.id
+      },
+      (payload) => {
+        mutate(`/api/translation/${params.id}`);
+      }
+    )
+    .subscribe();
+
+  useEffect(() => {
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, []);
 
   useEffect(() => {
     if (!data) return;

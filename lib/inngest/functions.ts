@@ -436,7 +436,7 @@ export const translateText = inngest.createFunction(
 
     const translatedText = await step.run('get-translation', async () => {
       // Translate transcription using GPT prompt
-      const prompt = `Translate the following text \n\n${translation.transcription}\n\n in ${translation.target_language}. The translation when speaked should match the original length of audio as we want to accuratly lipsync it to the original video`;
+      const prompt = `Translate the following text \n\n${translation.transcription}\n\n in ${translation.target_language}. The translation when speaked should match the original length of audio as we want to accuratly lipsync it to the original video. Since this is used inside an api call, return only the translation and nothing more`;
 
       const translationResponse = await nodeFetch(
         'https://api.openai.com/v1/chat/completions',
