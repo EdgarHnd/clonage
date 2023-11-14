@@ -293,7 +293,7 @@ export default function Generation({ params }: { params: { id: string } }) {
           .from('translations')
           .update({ translation: translation })
           .eq('id', params.id);
-  
+
         if (error) {
           throw error;
         }
@@ -394,10 +394,9 @@ export default function Generation({ params }: { params: { id: string } }) {
             <div className="flex mt-4 flex-row space-x-4">
               <Select
                 disabled={
-                  data?.status == 'completed' ||
-                  loading ||
-                  !transcript ||
-                  data?.status == 'translating'
+                  (data?.status != 'transribed' &&
+                    data?.status != 'translated') ||
+                  !transcript
                 }
                 value={targetLanguage || ''}
                 onValueChange={(e) => setTargetLanguage(e)}
@@ -443,9 +442,8 @@ export default function Generation({ params }: { params: { id: string } }) {
                 disabled={
                   !targetLanguage ||
                   !transcript ||
-                  data?.status == 'completed' ||
-                  data?.status == 'translating' ||
-                  loading
+                  (data?.status != 'transcribed' &&
+                    data?.status != 'translated')
                 }
                 onClick={translate}
               >
