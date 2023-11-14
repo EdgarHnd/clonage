@@ -210,7 +210,7 @@ export const onGenerationCompletion = inngest.createFunction(
     //send email with Resend api
     await step.run('send-email', async () => {
       const generationUrl = getURL() + 'generation/' + generationId;
-      const url = getURL() + 'api/send';
+      const url = getURL() + 'api/send-generation';
       const body = JSON.stringify({
         generationUrl,
         email
@@ -307,7 +307,7 @@ export const onTranslationCompletion = inngest.createFunction(
     //send email with Resend api
     await step.run('send-email', async () => {
       const translationUrl = getURL() + 'translation/' + translationId;
-      const url = getURL() + 'api/send';
+      const url = getURL() + 'api/send-translation';
       const body = JSON.stringify({
         translationUrl,
         email
