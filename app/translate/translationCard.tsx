@@ -53,7 +53,7 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
   return (
     <motion.div
       onClick={() => onClick(translation.id)}
-      className="text-white flex flex-col items-center border rounded border-gray-800 bg-black cursor-pointer"
+      className="text-white flex flex-col items-center border rounded border-gray-800 bg-black cursor-pointer hover:border-orange-400"
       key={translation.id}
       whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.2, ease: 'easeInOut' }}
@@ -62,9 +62,10 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
         <Badge className={badgecolor(translation.status)}>
           {statusIcon(translation.status)}
         </Badge>
-        <p>{getFlag(translation.target_language || '')} </p>
+        {translation.target_language && (
+          <Badge>{getFlag(translation.target_language || '')}</Badge>
+        )}
       </div>
-
       <div className="flex flex-col pb-4 h-32">
         {translation.original_video && (
           <video
