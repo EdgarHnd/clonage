@@ -447,11 +447,12 @@ export const translateText = inngest.createFunction(
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            model: 'gpt-3.5-turbo',
+            model: 'gpt-4',
             messages: [
               {
                 role: 'system',
-                content: 'You are a helpful assistant.'
+                content:
+                  'I am a translation expert that only produce valid translations. The translated output should be correct gramatically, semantically and should sound like it could be spoken by a native speaker'
               },
               {
                 role: 'user',

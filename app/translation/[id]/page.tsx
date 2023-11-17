@@ -98,6 +98,37 @@ export default function Generation({ params }: { params: { id: string } }) {
     console.log('uploading video file');
     setErrorMessage('');
     try {
+      const formData = new FormData();
+      formData.append('videoFile', file);
+      formData.append('id', params.id);
+
+      const response = await fetch('/api/upload-video', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || 'an error occurred during video upload'
+        );
+      }
+
+      const { message } = await response.json();
+      console.log(message);
+    } catch (error: any) {
+      setErrorMessage(error.message);
+      console.log(error.message);
+    } finally {
+      mutate(`/api/translation/${params.id}`);
+    }
+  };
+
+  /*  const uploadVideoFile = async (file: File | null) => {
+    if (!file) return;
+    console.log('uploading video file');
+    setErrorMessage('');
+    try {
       // Upload the video file to Supabase storage
       const path = `translations/${params.id}/${
         'input_video' + randomString(10) + '.mp4'
@@ -148,7 +179,7 @@ export default function Generation({ params }: { params: { id: string } }) {
       mutate(`/api/translation/${params.id}`);
     }
   };
-
+ */
   const translate = async () => {
     setLoading(true);
     setErrorMessage('');
@@ -364,7 +395,9 @@ export default function Generation({ params }: { params: { id: string } }) {
             <Label>original video</Label>
             <InputVideo
               disabled={
-                data?.status != 'created' && data?.status != 'transcribed'
+                data?.status != 'created' &&
+                data?.status != 'transcribed' &&
+                data?.status != 'transcribing'
               }
               onFileChange={handleVideoFileChange}
               existingUrl={originalVideo || ''}
@@ -374,7 +407,8 @@ export default function Generation({ params }: { params: { id: string } }) {
           <div className="flex flex-col items-start md:w-1/2 w-full text-white">
             <div className="flex flex-col w-full h-[300px] space-y-4 md:mt-0 mt-4">
               <Label htmlFor="script">transcript</Label>
-              {data?.status === 'transcribing' ? (
+              {data?.status === 'transcribing' ||
+              data?.status === 'uploading' ? (
                 <div className="rounded border border-dashed h-[270px] p-4 animate-pulse">
                   <div className="h-4 bg-gray-400 rounded w-3/4"></div>
                   <div className="h-4 mt-2 bg-gray-400 rounded w-1/2"></div>
