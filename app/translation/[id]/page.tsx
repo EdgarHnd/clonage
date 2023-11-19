@@ -194,10 +194,6 @@ export default function Generation({ params }: { params: { id: string } }) {
     }
   };
 
-  const runModel2 = async () => {
-    console.log('running model');
-  };
-
   const runModel = async () => {
     setLoading(true);
     setErrorMessage('');
@@ -257,7 +253,6 @@ export default function Generation({ params }: { params: { id: string } }) {
   const handleClick = () => {
     setOutput(null);
     generate();
-    /* runModel(); */
   };
 
   const handleDelete = async () => {
@@ -576,7 +571,7 @@ export default function Generation({ params }: { params: { id: string } }) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={runModel2}>Continue</AlertDialogAction>
+            <AlertDialogAction onClick={runModel}>Continue</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
