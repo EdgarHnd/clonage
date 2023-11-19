@@ -6,6 +6,7 @@ import { PropsWithChildren } from 'react';
 import 'styles/main.css';
 import { Analytics } from '@vercel/analytics/react';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { ThemeProvider } from '@/components/theme-provider';
 
 const meta = {
   title: 'Clonage - create unlimited videos, just add your script',
@@ -49,20 +50,27 @@ export default function RootLayout({
 }: PropsWithChildren) {
   return (
     <html lang="en">
-      <body className="bg-black loading text-white">
+      <body className="text-black dark:text-white bg-zinc-200 dark:bg-black">
         <SupabaseProvider>
-          <TooltipProvider delayDuration={800} skipDelayDuration={500} >
-            <Navbar />
-            <main
-              id="skip"
-              className="min-h-[calc(100dvh-4rem)] md:min-h[calc(100dvh-5rem)]"
-            >
-              {children}
-              <Analytics />
-            </main>
-            <Footer />
-            <Toaster />
-          </TooltipProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <TooltipProvider delayDuration={800} skipDelayDuration={500}>
+              <Navbar />
+              <main
+                id="skip"
+                className="min-h-[calc(100dvh-4rem)] md:min-h[calc(100dvh-5rem)]"
+              >
+                {children}
+                <Analytics />
+              </main>
+              <Footer />
+              <Toaster />
+            </TooltipProvider>
+          </ThemeProvider>
         </SupabaseProvider>
       </body>
     </html>

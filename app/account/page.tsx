@@ -4,7 +4,9 @@ import {
   getUserDetails,
   getSubscription
 } from '@/app/supabase-server';
+import SignOutButton from '@/components/ui/Navbar/SignOutButton';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Database } from '@/lib/database.types';
 import { createServerActionClient } from '@supabase/auth-helpers-nextjs';
 import { revalidatePath } from 'next/cache';
@@ -69,13 +71,13 @@ export default async function Account() {
   };
 
   return (
-    <section className="mb-32 bg-black">
+    <section className="mb-32 bg-zinc-200 dark:bg-black">
       <div className="max-w-6xl px-4 py-8 mx-auto sm:px-6 sm:pt-24 lg:px-8">
         <div className="sm:align-center sm:flex sm:flex-col">
-          <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
+          <h1 className="text-4xl font-extrabold dark:text-white sm:text-center sm:text-6xl">
             account
           </h1>
-          <p className="max-w-2xl m-auto mt-5 text-xl text-zinc-200 sm:text-center sm:text-2xl">
+          <p className="max-w-2xl m-auto mt-5 text-xl dark:text-zinc-200 sm:text-center sm:text-2xl">
             we partnered with Stripe for a simplified billing.
           </p>
         </div>
@@ -122,10 +124,10 @@ export default async function Account() {
         >
           <div className="mt-8 mb-4 text-xl font-semibold">
             <form id="nameForm" action={updateName}>
-              <input
+              <Input
                 type="text"
                 name="name"
-                className="w-1/2 p-3 rounded-md bg-zinc-800"
+                className="w-1/2 p-3 rounded-md"
                 defaultValue={userDetails?.full_name ?? ''}
                 placeholder="your name"
                 maxLength={64}
@@ -155,10 +157,10 @@ export default async function Account() {
         >
           <div className="mt-8 mb-4 text-xl font-semibold">
             <form id="emailForm" action={updateEmail}>
-              <input
+              <Input
                 type="text"
                 name="email"
-                className="w-1/2 p-3 rounded-md bg-zinc-800"
+                className="w-1/2 p-3 rounded-md"
                 defaultValue={user ? user.email : ''}
                 placeholder="your email"
                 maxLength={64}
@@ -167,6 +169,9 @@ export default async function Account() {
             </form>
           </div>
         </Card>
+        <div className="p-4 w-full flex flex-col items-center">
+          <SignOutButton />
+        </div>
       </div>
     </section>
   );
@@ -184,10 +189,10 @@ function Card({ title, description, footer, children }: Props) {
     <div className="w-full max-w-3xl m-auto my-8 border rounded-md p border-zinc-700">
       <div className="px-5 py-4">
         <h3 className="mb-1 text-2xl font-medium">{title}</h3>
-        <p className="text-zinc-300">{description}</p>
+        <p className="dark:text-zinc-300">{description}</p>
         {children}
       </div>
-      <div className="p-4 border-t rounded-b-md border-zinc-700 bg-zinc-900 text-zinc-500">
+      <div className="p-4 border-t rounded-b-md border-zinc-700 dark:bg-zinc-900 dark:text-zinc-500">
         {footer}
       </div>
     </div>

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { InputVideo } from '@/app/generate/inputs/inputVideo';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import useSWR, { mutate } from 'swr';
 import { randomString } from '@/lib/utils';
@@ -22,6 +22,16 @@ import {
 } from '@/components/ui/select';
 import { ScrollArea } from '@radix-ui/react-scroll-area';
 import { useToast } from '@/components/ui/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog';
 
 type Translation = Database['public']['Tables']['translations']['Row'];
 
@@ -40,7 +50,10 @@ export default function Generation({ params }: { params: { id: string } }) {
   const supabase = createClientComponentClient();
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [estimatedCost, setEstimatedCost] = useState<number>(0);
+  const [open, setOpen] = useState(false);
   const { toast } = useToast();
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const { data, error } = useSWR<Translation>(
     `/api/translation/${params.id}`,
@@ -124,62 +137,6 @@ export default function Generation({ params }: { params: { id: string } }) {
     }
   };
 
-  /*  const uploadVideoFile = async (file: File | null) => {
-    if (!file) return;
-    console.log('uploading video file');
-    setErrorMessage('');
-    try {
-      // Upload the video file to Supabase storage
-      const path = `translations/${params.id}/${
-        'input_video' + randomString(10) + '.mp4'
-      }`;
-      const { error: uploadError } = await supabase.storage
-        .from('public')
-        .upload(path, file);
-
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      // Get the URL of the uploaded video file
-      const { data: urlData } = supabase.storage
-        .from('public')
-        .getPublicUrl(path);
-
-      // Update the generation item with the URL
-      const { error: updateError } = await supabase
-        .from('translations')
-        .update({
-          original_video: urlData?.publicUrl,
-          status: 'transcribing'
-        })
-        .eq('id', params.id);
-
-      if (updateError) {
-        throw updateError;
-      }
-
-      const response = await fetch(`/api/transcribe/${params.id}`, {
-        method: 'POST'
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message || 'an error occurred during transcription'
-        );
-      }
-
-      const transcription = await response.json();
-      console.log(transcription);
-    } catch (error: any) {
-      setErrorMessage(error.message);
-      console.log(error.message);
-    } finally {
-      mutate(`/api/translation/${params.id}`);
-    }
-  };
- */
   const translate = async () => {
     setLoading(true);
     setErrorMessage('');
@@ -215,6 +172,30 @@ export default function Generation({ params }: { params: { id: string } }) {
       setLoading(false);
       mutate(`/api/translation/${params.id}`);
     }
+  };
+
+  const generate = async () => {
+    try {
+      if (!data?.translation) throw new Error('No script provided');
+      if (!data?.original_video) throw new Error('No video provided');
+      if (!data?.target_language)
+        throw new Error('No target language provided');
+      if (!data?.original_video_duration)
+        throw new Error('Could not get video length');
+
+      const costPerMinute = 100;
+      const originalVideoLength = data?.original_video_duration / 60;
+      if (!originalVideoLength) throw new Error('Could not get video length');
+      setEstimatedCost(Math.ceil(originalVideoLength * costPerMinute));
+      setOpen(true);
+    } catch (error: any) {
+      setErrorMessage(error.message);
+      console.log(error.message);
+    }
+  };
+
+  const runModel2 = async () => {
+    console.log('running model');
   };
 
   const runModel = async () => {
@@ -275,7 +256,8 @@ export default function Generation({ params }: { params: { id: string } }) {
 
   const handleClick = () => {
     setOutput(null);
-    runModel();
+    generate();
+    /* runModel(); */
   };
 
   const handleDelete = async () => {
@@ -345,7 +327,7 @@ export default function Generation({ params }: { params: { id: string } }) {
   const renderOutput = () => {
     if (data?.status === 'processing') {
       return (
-        <div className="flex flex-col space-y-4 md:w-1/2 w-full text-white">
+        <div className="flex flex-col space-y-4 md:w-1/2 w-full dark:text-white">
           <Label htmlFor="output">generated video</Label>
           <div
             role="status"
@@ -368,16 +350,16 @@ export default function Generation({ params }: { params: { id: string } }) {
     }
     if (output) {
       return (
-        <div className="flex flex-col space-y-4 md:w-1/2 w-full text-white">
+        <div className="flex flex-col space-y-4 md:w-1/2 w-full dark:text-white">
           <Label htmlFor="output">generated video</Label>
           <video className="rounded h-[280px]" src={output} controls />
         </div>
       );
     } else {
       return (
-        <div className="flex flex-col space-y-4 md:w-1/2 w-full text-white">
+        <div className="flex flex-col space-y-4 md:w-1/2 w-full dark:text-white">
           <Label htmlFor="output">generated video</Label>
-          <div className="rounded border border-dashed h-[270px] p-4">
+          <div className="rounded border border-gray-400 border-dashed h-[270px] p-4">
             <p className="text-gray-700 text-sm">
               the generated video will show here
             </p>
@@ -404,7 +386,7 @@ export default function Generation({ params }: { params: { id: string } }) {
               removeVideo={removeVideo}
             />
           </div>
-          <div className="flex flex-col items-start md:w-1/2 w-full text-white">
+          <div className="flex flex-col items-start md:w-1/2 w-full dark:text-white">
             <div className="flex flex-col w-full h-[300px] space-y-4 md:mt-0 mt-4">
               <Label htmlFor="script">transcript</Label>
               {data?.status === 'transcribing' ||
@@ -480,6 +462,7 @@ export default function Generation({ params }: { params: { id: string } }) {
                     data?.status != 'translated')
                 }
                 onClick={translate}
+                variant="secondary"
               >
                 {data?.status === 'translating' ? (
                   <>
@@ -544,7 +527,6 @@ export default function Generation({ params }: { params: { id: string } }) {
               <div className="flex flex-col items-center space-y-2">
                 <Button
                   disabled={loading || finalOutputStatus != 'translated'}
-                  variant="secondary"
                   onClick={handleClick}
                 >
                   {loading ? (
@@ -583,6 +565,21 @@ export default function Generation({ params }: { params: { id: string } }) {
           )}
         </div>
       </div>
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>generate video translation?</AlertDialogTitle>
+            <AlertDialogDescription>
+              this will start the generation process and use arround{' '}
+              {estimatedCost} credits
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={runModel2}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

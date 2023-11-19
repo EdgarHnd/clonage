@@ -271,6 +271,7 @@ export const onTranslationCompletion = inngest.createFunction(
       throw new Error('No user found');
     }
     const email = user.user.email;
+
     // Update credits
     await step.run('update-credits', async () => {
       const { data: creditData, error: creditError } = await supabase
@@ -289,8 +290,9 @@ export const onTranslationCompletion = inngest.createFunction(
         creditData[0].credits_remaining &&
         creditData[0].credits_used !== null
       ) {
-        const newCreditsRemaining = creditData[0].credits_remaining - 1;
-        const newCreditsUsed = creditData[0].credits_used + 1;
+        const cost = translation.cost;
+        const newCreditsRemaining = creditData[0].credits_remaining - cost;
+        const newCreditsUsed = creditData[0].credits_used + cost;
         console.log('credits_remaining', newCreditsRemaining);
         console.log('credits_used', newCreditsUsed);
         await supabase

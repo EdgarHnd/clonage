@@ -83,7 +83,7 @@ export function InputVideo({
   });
 
   return (
-    <div className="flex flex-col space-y-2 w-full items-center text-white">
+    <div className="flex flex-col space-y-2 w-full items-center dark:text-white">
       {fileUrl ? (
         <>
           {' '}
@@ -101,7 +101,7 @@ export function InputVideo({
       ) : (
         <div
           {...getRootProps()}
-          className="outline-dashed outline-2 outline-gray-100 h-[270px] hover:outline-yellow-500 w-full rounded-md p-4 flex justify-center align-middle"
+          className="outline-dashed outline-2 dark:outline-gray-100 h-[270px] hover:outline-yellow-500 w-full rounded-md p-4 flex justify-center align-middle"
         >
           <input {...getInputProps()} />
           {isDragActive ? (

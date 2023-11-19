@@ -4,6 +4,7 @@ import { useSupabase } from '@/app/supabase-provider';
 import { useRouter } from 'next/navigation';
 
 import s from './Navbar.module.css';
+import { Button } from '../button';
 
 export default function SignOutButton() {
   const router = useRouter();
@@ -13,11 +14,11 @@ export default function SignOutButton() {
     router.refresh()
   }
   return (
-    <button
-      className={s.link}
+    <Button
+      variant="destructive"
       onClick={handleSignOut}
     >
       sign out
-    </button>
+    </Button>
   );
 }

@@ -62,6 +62,7 @@ export async function POST(req: Request) {
         format: 'mp4'
       });
 
+      const duration: number = Math.ceil(result.duration);
       // The URL of the uploaded and converted video
       const convertedVideoUrl = result.secure_url;
 
@@ -100,6 +101,7 @@ export async function POST(req: Request) {
         .from('translations')
         .update({
           original_video: urlData?.publicUrl,
+          original_video_duration: duration,
           status: 'transcribing'
         })
         .eq('id', id);

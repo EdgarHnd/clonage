@@ -96,6 +96,7 @@ export interface Database {
       }
       generations: {
         Row: {
+          cost: number | null
           created_at: string
           id: string
           input_text: string | null
@@ -108,6 +109,7 @@ export interface Database {
           voice: string | null
         }
         Insert: {
+          cost?: number | null
           created_at?: string
           id?: string
           input_text?: string | null
@@ -120,6 +122,7 @@ export interface Database {
           voice?: string | null
         }
         Update: {
+          cost?: number | null
           created_at?: string
           id?: string
           input_text?: string | null
@@ -296,9 +299,11 @@ export interface Database {
       }
       translations: {
         Row: {
+          cost: number | null
           created_at: string
           id: string
           original_video: string | null
+          original_video_duration: number | null
           output_audio: string | null
           output_video: string | null
           output_video_id: string | null
@@ -309,9 +314,11 @@ export interface Database {
           user: string | null
         }
         Insert: {
+          cost?: number | null
           created_at?: string
           id?: string
           original_video?: string | null
+          original_video_duration?: number | null
           output_audio?: string | null
           output_video?: string | null
           output_video_id?: string | null
@@ -322,9 +329,11 @@ export interface Database {
           user?: string | null
         }
         Update: {
+          cost?: number | null
           created_at?: string
           id?: string
           original_video?: string | null
+          original_video_duration?: number | null
           output_audio?: string | null
           output_video?: string | null
           output_video_id?: string | null

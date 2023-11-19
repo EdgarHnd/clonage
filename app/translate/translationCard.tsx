@@ -53,7 +53,7 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
   return (
     <motion.div
       onClick={() => onClick(translation.id)}
-      className="text-white flex flex-col items-center border rounded border-gray-800 bg-black cursor-pointer hover:border-orange-400"
+      className="text-white flex flex-col items-center border rounded border-gray-800 dark:bg-black cursor-pointer hover:border-orange-400"
       key={translation.id}
       whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.2, ease: 'easeInOut' }}
