@@ -125,7 +125,7 @@ export default function TranslateComponent({ hasPaid }: { hasPaid: boolean }) {
           <>
             {hasPaid ? (
               <div className="flex flex-row space-x-4 items-center justify-between">
-                <Badge>
+                {/* <Badge>
                   you have {creditsRemaining} credits remaining
                   <Link
                     className="text-orange-500 hover:text-orange-400 ml-1"
@@ -134,14 +134,15 @@ export default function TranslateComponent({ hasPaid }: { hasPaid: boolean }) {
                     {' '}
                     upgrade
                   </Link>
-                </Badge>
+                </Badge> */}
+                <div></div>
                 <div className="flex flex-row items-center space-x-4 dark:text-white">
                   <NewTranslationButton />
                 </div>
               </div>
             ) : creditsRemaining > 0 ? (
               <div className="flex flex-row space-x-4 items-center justify-between">
-                <Badge>
+                {/* <Badge>
                   you have {creditsRemaining} credits remaining
                   <Link
                     className="text-orange-500 hover:text-orange-400 ml-1"
@@ -150,7 +151,8 @@ export default function TranslateComponent({ hasPaid }: { hasPaid: boolean }) {
                     {' '}
                     upgrade
                   </Link>
-                </Badge>
+                </Badge> */}
+                <div></div>
                 <div className="flex flex-row items-center space-x-4 dark:text-white">
                   <NewTranslationButton />
                 </div>

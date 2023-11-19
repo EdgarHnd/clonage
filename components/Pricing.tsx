@@ -208,7 +208,7 @@ export default function Pricing({
                 free trial
               </h2>
               <p className="mt-4 text-zinc-300 lowercase">
-                get 10 free credits to try out the app
+                get 100 free credits to try out the app
               </p>
               <p className="mt-8">
                 <span className="text-5xl font-extrabold text-white">$0</span>

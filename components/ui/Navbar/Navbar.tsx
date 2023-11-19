@@ -8,6 +8,7 @@ import CollapsibleMenu from './CollapsibleMenu';
 import { ModeToggle } from '@/components/theme-toggle';
 import { PersonIcon } from '@radix-ui/react-icons';
 import { Button } from '../button';
+import { RemainingCreditsBadge } from '../remainingCreditsBadge';
 
 export default async function Navbar() {
   const supabase = createServerSupabaseClient();
@@ -30,7 +31,9 @@ export default async function Navbar() {
               aria-label="Logo"
             >
               <Logo />
-              <p className="text-2xl font-bold text-black dark:text-white ml-3">clonage</p>
+              <p className="text-2xl font-bold text-black dark:text-white ml-3">
+                clonage
+              </p>
             </Link>
             <nav className="hidden ml-12 space-x-6 md:flex">
               {user ? (
@@ -51,11 +54,14 @@ export default async function Navbar() {
           </div>
           <div className="justify-end flex-1 space-x-4 md:flex hidden">
             {user ? (
-              <Link href="/account">
-                <Button variant={'outline'}>
-                  <PersonIcon className="w-5 h-5" />
-                </Button>
-              </Link>
+              <>
+                <RemainingCreditsBadge />
+                <Link href="/account">
+                  <Button variant={'outline'}>
+                    <PersonIcon className="w-5 h-5" />
+                  </Button>
+                </Link>
+              </>
             ) : (
               <Link href="/signin">
                 <Button>sign in</Button>
