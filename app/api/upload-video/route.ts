@@ -102,7 +102,8 @@ export async function POST(req: Request) {
         .update({
           original_video: urlData?.publicUrl,
           original_video_duration: duration,
-          status: 'transcribing'
+          status: 'transcribing',
+          cost: duration
         })
         .eq('id', id);
 

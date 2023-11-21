@@ -1,5 +1,4 @@
 import { Badge } from '@/components/ui/badge';
-import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Database } from '@/lib/database.types';
 import { getFlag } from '@/utils/helpers';
 import {
@@ -53,13 +52,13 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
   return (
     <motion.div
       onClick={() => onClick(translation.id)}
-      className="text-white flex flex-col items-center border rounded border-gray-800 dark:bg-black cursor-pointer hover:border-orange-400"
+      className="dark:text-white flex flex-col items-center border rounded border-gray-800 dark:bg-black cursor-pointer hover:border-orange-400"
       key={translation.id}
       whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.2, ease: 'easeInOut' }}
     >
       <div className="flex flex-row items-center justify-between w-full px-4 pt-4 pb-2">
-        <Badge className={badgecolor(translation.status)}>
+        <Badge className={badgecolor(translation.status) + ' text-white'}>
           {statusIcon(translation.status)}
         </Badge>
         {translation.target_language && (

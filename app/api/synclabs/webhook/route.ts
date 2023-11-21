@@ -79,8 +79,7 @@ export async function POST(req: Request) {
         .from(table)
         .update({
           output_video: urlData.url,
-          status: 'completed',
-          cost: payload.result.credits_deducted
+          status: 'completed'
         })
         .eq('id', item.id);
 
